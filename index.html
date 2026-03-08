@@ -21,14 +21,13 @@
 
         #cardsList { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
         
-        /* STYL KARTY - CAH STYLE */
         .card { 
             aspect-ratio: 2.5/3.5; 
             padding: 20px; 
             border-radius: 14px; 
             display: flex; 
             flex-direction: column; 
-            justify-content: flex-start; /* Text nahoru */
+            justify-content: flex-start; 
             color: var(--black); 
             box-shadow: 0 8px 20px rgba(0,0,0,0.5); 
             position: relative; 
@@ -38,12 +37,11 @@
         .card-otázka { background: var(--yellow); border-color: var(--black); }
         .card-odpověď { background: var(--white); border-color: var(--yellow); }
         
-        /* Obsah karty */
         .card h3 { 
             margin: 0; 
             font-size: 1.3rem; 
             line-height: 1.25; 
-            text-align: left; /* Zarovnání vlevo jako u CAH */
+            text-align: left; 
             font-weight: bold;
             word-wrap: break-word;
             padding-top: 5px;
@@ -51,7 +49,6 @@
         
         .vote-count { position: absolute; top: 12px; right: 15px; font-size: 0.7rem; font-weight: 900; opacity: 0.6; }
         
-        /* Spodní část karty s tlačítkem */
         .card-footer { margin-top: auto; padding-top: 15px; text-align: center; }
         
         .btn-vote { width: 100%; background: var(--black); color: var(--white); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
@@ -59,11 +56,11 @@
         .card-odpověď .btn-vote { background: var(--yellow); color: var(--black); }
 
         .brand-subtext { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 900; margin-top: 8px; display: block; }
-        .card-otázka .brand-subtext, .card-odpověď .brand-subtext { color: var(--black); opacity: 0.9; }
-
-        /* Formulář */
+        
         input, select, button.submit-btn { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: none; font-size: 1rem; box-sizing: border-box; }
         .submit-btn { background: var(--yellow); color: var(--black); font-weight: bold; text-transform: uppercase; cursor: pointer; border: 2px solid var(--black); }
+        .submit-btn:disabled { background: #555; color: #888; border-color: #444; cursor: not-allowed; }
+        
         .add-suggestion { background: #1a1a1a; padding: 30px; border-radius: 15px; border: 3px dashed var(--yellow); margin-top: 50px; }
         
         a { color: var(--yellow); }
@@ -83,7 +80,7 @@
     </div>
 
     <div id="welcomeBack" class="user-welcome hidden" style="text-align:center; margin-bottom:20px;">
-        <p>Ahoj <span id="displayUserName" style="color:var(--yellow)"></span>! Zbývá ti <span id="remainingSuggestions" style="color:var(--yellow)">3</span> návrhů.</p>
+        <p>Ahoj <span id="displayUserName" style="color:var(--yellow)"></span>! Zbývá ti <span id="remainingSuggestions" style="color:var(--yellow)">3</span> návrhy.</p>
     </div>
 
     <div class="controls">
@@ -183,10 +180,14 @@
 
         function updateSuggestionCountDisplay() {
             const count = parseInt(localStorage.getItem('suggestionsCount') || '0');
-            document.getElementById('remainingSuggestions').innerText = 3 - count;
+            const remaining = Math.max(0, 3 - count);
+            document.getElementById('remainingSuggestions').innerText = remaining;
+            
             if (count >= 3) {
-                document.getElementById('submitSuggestionBtn').disabled = true;
-                document.getElementById('submitSuggestionBtn').innerText = 'LIMIT VYČERPÁN';
+                const btn = document.getElementById('submitSuggestionBtn');
+                btn.style.background = '#555';
+                btn.style.color = '#888';
+                btn.innerText = 'LIMIT VYČERPÁN';
             }
         }
 
@@ -202,15 +203,25 @@
 
         async function suggestCard() {
             const count = parseInt(localStorage.getItem('suggestionsCount') || '0');
+            
+            // TADY JE TA HLÁŠKA
+            if (count >= 3) {
+                alert("Tvůj limit pro návrhy je vyčerpán, zkus požádat tvojí mámu, aby vyplnila další návrhy za tebe.");
+                return;
+            }
+
             const title = document.getElementById('newTitle').value;
-            if (count >= 3 || !title) return;
+            if (!title) { alert("Napiš nejdřív text karty!"); return; }
+
             const { error } = await _supabase.from('cards').insert([{
                 title: title, card_type: document.getElementById('newType').value, is_official: false
             }]);
+
             if (!error) {
                 localStorage.setItem('suggestionsCount', (count + 1).toString());
                 document.getElementById('newTitle').value = '';
                 updateSuggestionCountDisplay();
+                alert('Návrh odeslán! Úspěšně jsi Dickobrazovi zavařil mozek.');
                 fetchCards();
             }
         }
