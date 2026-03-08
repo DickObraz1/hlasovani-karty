@@ -3,64 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hlasování o nových kartách</title>
+    <title>Hlasování o nových kartách | Dickobraz</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --yellow: #fbda18; --black: #000000; --white: #ffffff; }
-        body { font-family: 'Arial Black', Gadget, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: var(--black); color: var(--white); }
-        h1, h2 { text-align: center; color: var(--yellow); text-transform: uppercase; letter-spacing: 2px; }
+        body { font-family: 'Arial Black', Gadget, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background: var(--black); color: var(--white); }
+        h1 { text-align: center; color: var(--yellow); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; }
         
-        .user-info-section { background: #1a1a1a; padding: 25px; border-radius: 15px; border: 2px solid var(--yellow); margin-bottom: 40px; }
+        /* Sekce uživatele */
+        .user-info-section { background: #1a1a1a; padding: 25px; border-radius: 15px; border: 2px solid var(--yellow); margin-bottom: 30px; }
         .hidden { display: none; }
         
-        #cardsList { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
-        .card { aspect-ratio: 2.5/3.5; padding: 25px; border-radius: 15px; display: flex; flex-direction: column; justify-content: space-between; color: var(--black); box-shadow: 0 10px 20px rgba(0,0,0,0.3); position: relative; border: 4px solid transparent; }
+        /* Ovládací prvky (Filtry a Řazení) */
+        .controls { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; padding: 0 10px; }
+        .filter-group button { background: #333; color: white; border: 1px solid var(--yellow); padding: 8px 15px; cursor: pointer; border-radius: 5px; font-family: sans-serif; font-weight: bold; margin-right: 5px; }
+        .filter-group button.active { background: var(--yellow); color: var(--black); }
+        .sort-group select { background: #333; color: white; border: 1px solid var(--yellow); padding: 8px; border-radius: 5px; }
+
+        /* Grid a Karty */
+        #cardsList { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; }
+        .card { 
+            aspect-ratio: 2.5/3.5; 
+            padding: 20px; 
+            border-radius: 18px; 
+            display: flex; 
+            flex-direction: column; 
+            color: var(--black); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
+            position: relative; 
+            border: 5px solid transparent;
+            text-align: center;
+        }
         .card-otázka { background: var(--yellow); border-color: var(--black); }
         .card-odpověď { background: var(--white); border-color: var(--yellow); }
         
-        .vote-count { position: absolute; top: 10px; right: 15px; font-size: 0.8rem; background: rgba(0,0,0,0.1); padding: 2px 8px; border-radius: 10px; }
-        .card h3 { margin: 20px 0 0; font-size: 1.3rem; line-height: 1.2; }
+        /* Středění textu v kartě */
+        .card-content { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 10px; }
+        .card h3 { margin: 0; font-size: 1.4rem; line-height: 1.2; word-wrap: break-word; }
         
-        .btn-vote { width: 100%; background: var(--black); color: var(--white); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .vote-count { position: absolute; top: 12px; right: 15px; font-size: 0.75rem; font-weight: bold; opacity: 0.7; }
+        
+        .btn-vote { width: 100%; background: var(--black); color: var(--white); border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-bottom: 5px; }
         .card-otázka .btn-vote { color: var(--yellow); }
         .card-odpověď .btn-vote { background: var(--yellow); color: var(--black); }
 
+        .brand-subtext { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; opacity: 0.8; }
+        .card-otázka .brand-subtext { color: var(--black); }
+        .card-odpověď .brand-subtext { color: var(--black); }
+
+        /* Formulář a vstupy */
         input, select, button.submit-btn { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: none; font-size: 1rem; box-sizing: border-box; }
         .submit-btn { background: var(--yellow); color: var(--black); font-weight: bold; text-transform: uppercase; cursor: pointer; }
         .add-suggestion { background: #1a1a1a; padding: 30px; border-radius: 15px; border: 3px dashed var(--yellow); margin-top: 50px; }
         
-        a { color: var(--yellow); text-decoration: underline; }
-        .user-welcome { text-align: center; margin-bottom: 20px; color: var(--yellow); }
+        a { color: var(--yellow); }
     </style>
 </head>
 <body>
 
-    <h1>⚡ Rozhodni o nové edici ⚡</h1>
+    <h1>⚡ ROZHODNI O NOVÉ EDICI ⚡</h1>
 
     <div id="userInfoSection" class="user-info-section">
-        <input type="email" id="userEmail" placeholder="Tvůj e-mail (nutné pro účast)*">
+        <input type="email" id="userEmail" placeholder="Tvůj e-mail*">
         <input type="text" id="userName" placeholder="Tvé jméno (dobrovolné)">
-        <label style="font-size: 0.8rem;">
+        <label style="font-size: 0.8rem; display: block; margin-bottom: 10px;">
             <input type="checkbox" id="marketingConsent"> Chci vědět, až rozšíření vyjde a souhlasím se <a href="https://www.dickobraz.cz/podminky-ochrany-osobnich-udaju" target="_blank">zpracováním osobních údajů.</a>
         </label>
-        <button onclick="saveUser()" class="submit-btn" style="margin-top: 15px;">Potvrdit údaje a začít</button>
+        <button onclick="saveUser()" class="submit-btn">Potvrdit a začít</button>
     </div>
 
-    <div id="welcomeBack" class="user-welcome hidden">
-        <p>Ahoj <span id="displayUserName"></span>! Můžeš hlasovat a navrhnout ještě <span id="remainingSuggestions">3</span> karty.</p>
-        <button onclick="clearUser()" style="background: none; border: none; color: white; text-decoration: underline; cursor: pointer; font-size: 0.7rem;">Změnit e-mail</button>
+    <div id="welcomeBack" class="user-welcome hidden" style="text-align:center; margin-bottom:20px;">
+        <p>Ahoj <span id="displayUserName" style="color:var(--yellow)"></span>! Zbývá ti <span id="remainingSuggestions" style="color:var(--yellow)">3</span> návrhů.</p>
     </div>
 
-    <div id="cardsList"><h2>Načítám karty...</h2></div>
+    <div class="controls">
+        <div class="filter-group" id="filterGroup">
+            <button class="active" onclick="setFilter('vše', this)">VŠE</button>
+            <button onclick="setFilter('otázka', this)">OTÁZKY</button>
+            <button onclick="setFilter('odpověď', this)">ODPOVĚDI</button>
+        </div>
+        <div class="sort-group">
+            <select id="sortSelect" onchange="fetchCards()">
+                <option value="newest">Od nejnovějších</option>
+                <option value="popular">Nejvíce hlasů</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="cardsList"><h2>Načítám svět Dickobraza...</h2></div>
 
     <div id="suggestionForm" class="add-suggestion hidden">
-        <h3>💡 Navrhni vlastní kartu</h3>
+        <h3>💡 NAVRHNI VLASTNÍ KARTU</h3>
         <select id="newType">
             <option value="otázka">Typ: OTÁZKA (Žlutá)</option>
             <option value="odpověď">Typ: ODPOVĚĎ (Bílá)</option>
         </select>
         <input type="text" id="newTitle" placeholder="Text na kartě...">
-        <button id="submitSuggestionBtn" onclick="suggestCard()" class="submit-btn">Odeslat můj návrh</button>
+        <button id="submitSuggestionBtn" onclick="suggestCard()" class="submit-btn">ODESLAT NÁVRH</button>
     </div>
 
     <script>
@@ -68,17 +107,69 @@
         const SUPABASE_KEY = 'sb_publishable_vGycWa1bjT2riAUXTT6pNA_xjRvPHeP'; 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // --- LOGIKA PAMĚTI ---
+        let currentFilter = 'vše';
+
+        function setFilter(type, btn) {
+            currentFilter = type;
+            document.querySelectorAll('#filterGroup button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            fetchCards();
+        }
+
+        async function fetchCards() {
+            const sortBy = document.getElementById('sortSelect').value;
+            
+            // 1. Získání karet
+            let query = _supabase.from('cards').select('*');
+            if (currentFilter !== 'vše') {
+                query = query.eq('card_type', currentFilter);
+            }
+            
+            const { data: cards } = await query;
+            const { data: voteCounts } = await _supabase.from('card_votes_count').select('*');
+
+            // Spárování hlasů ke kartám
+            let cardsWithVotes = cards.map(card => ({
+                ...card,
+                votes: voteCounts?.find(v => v.card_id === card.id)?.total_votes || 0
+            }));
+
+            // 2. Řazení
+            if (sortBy === 'popular') {
+                cardsWithVotes.sort((a, b) => b.votes - a.votes);
+            } else {
+                cardsWithVotes.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            }
+
+            const container = document.getElementById('cardsList');
+            container.innerHTML = '';
+
+            cardsWithVotes.forEach(card => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = `card card-${card.card_type || 'otázka'}`;
+                cardDiv.innerHTML = `
+                    <div class="vote-count">🔥 ${card.votes}</div>
+                    <div class="card-content">
+                        <h3>${card.title}</h3>
+                    </div>
+                    <div class="vote-btn-container">
+                        <button class="btn-vote" onclick="handleVote('${card.id}')">HLASOVAT</button>
+                        <div class="brand-subtext">KARTY BEZ CENZURY</div>
+                    </div>
+                `;
+                container.appendChild(cardDiv);
+            });
+        }
+
+        // --- Zbytek funkcí (saveUser, checkUser, suggestCard atd.) zůstává stejný ---
         function saveUser() {
             const email = document.getElementById('userEmail').value;
             const name = document.getElementById('userName').value || 'pařmene';
             const consent = document.getElementById('marketingConsent').checked;
-
             if (!email || !consent) { alert("Musíš vyplnit e-mail a souhlas!"); return; }
-
             localStorage.setItem('userEmail', email);
             localStorage.setItem('userName', name);
-            localStorage.setItem('suggestionsCount', '0');
+            if(!localStorage.getItem('suggestionsCount')) localStorage.setItem('suggestionsCount', '0');
             checkUser();
         }
 
@@ -95,72 +186,32 @@
 
         function updateSuggestionCountDisplay() {
             const count = parseInt(localStorage.getItem('suggestionsCount') || '0');
-            const remaining = 3 - count;
-            document.getElementById('remainingSuggestions').innerText = remaining;
-            if (remaining <= 0) {
+            document.getElementById('remainingSuggestions').innerText = 3 - count;
+            if (count >= 3) {
                 document.getElementById('submitSuggestionBtn').disabled = true;
-                document.getElementById('submitSuggestionBtn').innerText = 'Limit 3 návrhů vyčerpán';
+                document.getElementById('submitSuggestionBtn').innerText = 'LIMIT VYČERPÁN';
             }
-        }
-
-        function clearUser() { localStorage.clear(); location.reload(); }
-
-        // --- NAČÍTÁNÍ KARET A HLASŮ ---
-        async function fetchCards() {
-            // Získáme karty
-            const { data: cards } = await _supabase.from('cards').select('*').order('created_at', { ascending: false });
-            // Získáme počty hlasů z našeho nového View
-            const { data: voteCounts } = await _supabase.from('card_votes_count').select('*');
-
-            const container = document.getElementById('cardsList');
-            container.innerHTML = '';
-
-            cards.forEach(card => {
-                const votes = voteCounts?.find(v => v.card_id === card.id)?.total_votes || 0;
-                const cardDiv = document.createElement('div');
-                cardDiv.className = `card card-${card.card_type || 'otázka'}`;
-                cardDiv.innerHTML = `
-                    <div class="vote-count">🔥 ${votes} hlasů</div>
-                    <h3>${card.title}</h3>
-                    <div class="vote-btn-container">
-                        <button class="btn-vote" onclick="handleVote('${card.id}')">Hlasovat</button>
-                    </div>
-                `;
-                container.appendChild(cardDiv);
-            });
         }
 
         async function handleVote(cardId) {
             const email = localStorage.getItem('userEmail');
             if (!email) { alert("Nejdřív vyplň údaje nahoře!"); return; }
-
             const { error } = await _supabase.from('votes').insert([{
-                card_id: cardId, user_email: email, 
-                user_name: localStorage.getItem('userName'), marketing_consent: true
+                card_id: cardId, user_email: email, user_name: localStorage.getItem('userName'), marketing_consent: true
             }]);
-
-            if (error) {
-                alert(error.code === '23505' ? 'Už jsi pro tuhle kartu hlasoval!' : 'Chyba: ' + error.message);
-            } else {
-                alert('Díky za hlas!');
-                fetchCards();
-            }
+            if (error) alert(error.code === '23505' ? 'Už jsi hlasoval!' : 'Chyba: ' + error.message);
+            else { alert('Díky za hlas!'); fetchCards(); }
         }
 
         async function suggestCard() {
             const count = parseInt(localStorage.getItem('suggestionsCount') || '0');
-            if (count >= 3) { alert('Můžeš poslat maximálně 3 návrhy.'); return; }
-
             const title = document.getElementById('newTitle').value;
-            if (!title) return;
-
+            if (count >= 3 || !title) return;
             const { error } = await _supabase.from('cards').insert([{
                 title: title, card_type: document.getElementById('newType').value, is_official: false
             }]);
-
             if (!error) {
                 localStorage.setItem('suggestionsCount', (count + 1).toString());
-                alert('Návrh odeslán!');
                 document.getElementById('newTitle').value = '';
                 updateSuggestionCountDisplay();
                 fetchCards();
