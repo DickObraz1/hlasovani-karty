@@ -6,16 +6,14 @@
     <title>Hlasování o nových kartách | Dickobraz</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --yellow: #fbda18; --black: #000000; --white: #ffffff; --grey: #333; }
+        :root { --yellow: #fbda18; --black: #000000; --white: #ffffff; --dark-grey: #444; }
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background: var(--black); color: var(--white); -webkit-font-smoothing: antialiased; }
         
         h1 { text-align: center; color: var(--yellow); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; font-weight: 900; }
         
-        /* Sekce uživatele */
         .user-info-section { background: #1a1a1a; padding: 25px; border-radius: 15px; border: 2px solid var(--yellow); margin-bottom: 30px; }
         .hidden { display: none; }
         
-        /* Motivační box */
         .promo-box { background: var(--yellow); color: var(--black); padding: 20px; border-radius: 15px; margin-bottom: 30px; text-align: center; border: 3px solid var(--white); }
         .promo-box h4 { margin: 0 0 10px 0; font-size: 1.2rem; text-transform: uppercase; }
         .promo-box p { margin: 0; font-weight: bold; font-size: 0.95rem; line-height: 1.4; }
@@ -29,21 +27,38 @@
         
         .card { 
             aspect-ratio: 2.5/3.5; padding: 20px; border-radius: 14px; display: flex; flex-direction: column; 
-            justify-content: flex-start; color: var(--black); shadow: 0 8px 20px rgba(0,0,0,0.5); 
+            justify-content: flex-start; color: var(--black); box-shadow: 0 8px 20px rgba(0,0,0,0.5); 
             position: relative; border: 4px solid transparent; box-sizing: border-box;
         }
         .card-otázka { background: var(--yellow); border-color: var(--black); }
         .card-odpověď { background: var(--white); border-color: var(--yellow); }
         
-        .card h3 { margin: 0; font-size: 1.3rem; line-height: 1.25; text-align: left; font-weight: bold; word-wrap: break-word; padding-top: 5px; }
+        .card h3 { margin: 0; font-size: 1.3rem; line-height: 1.25; text-align: left; font-weight: bold; word-wrap: break-word; padding-top: 10px; }
+        
+        /* Horní info na kartě */
         .vote-count { position: absolute; top: 12px; right: 15px; font-size: 0.7rem; font-weight: 900; opacity: 0.6; }
+        .report-btn { position: absolute; top: 12px; left: 15px; font-size: 0.8rem; cursor: pointer; opacity: 0.3; transition: 0.2s; border: none; background: none; padding: 0; }
+        .report-btn:hover { opacity: 1; transform: scale(1.2); }
         
         .card-footer { margin-top: auto; padding-top: 15px; text-align: center; }
         
+        /* Tlačítka */
         .btn-group { display: flex; gap: 8px; margin-bottom: 8px; }
         .btn-vote { flex: 4; background: var(--black); color: var(--white); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
-        .btn-voted { background: transparent !important; color: var(--black) !important; border: 2px solid var(--black) !important; cursor: default; }
-        .btn-share { flex: 1; background: rgba(0,0,0,0.1); border: 2px solid var(--black); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        
+        /* UNIFORMNÍ DESIGN PRO HLASOVÁNO */
+        .btn-voted { 
+            background: rgba(0,0,0,0.1) !important; 
+            color: var(--black) !important; 
+            border: 3px solid var(--black) !important; 
+            cursor: default; 
+            flex: 5; /* Schová share při stavu hlasováno */
+        }
+        
+        .btn-share { 
+            flex: 1; background: transparent; border: 2px solid var(--black); border-radius: 8px; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; 
+        }
         
         .card-otázka .btn-vote { color: var(--yellow); }
         .card-odpověď .btn-vote { background: var(--yellow); color: var(--black); }
@@ -55,10 +70,9 @@
         .submit-btn { background: var(--yellow); color: var(--black); font-weight: bold; text-transform: uppercase; cursor: pointer; border: 2px solid var(--black); }
         
         .add-suggestion { background: #1a1a1a; padding: 30px; border-radius: 15px; border: 3px dashed var(--yellow); margin-top: 50px; position: relative; }
-        .char-counter { position: absolute; right: 40px; bottom: 95px; font-size: 0.75rem; color: var(--yellow); font-weight: bold; }
+        .char-counter { text-align: right; margin-top: -10px; margin-bottom: 10px; font-size: 0.75rem; color: var(--dark-grey); font-weight: bold; }
         
-        /* Toast notifikace */
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--yellow); color: var(--black); padding: 10px 20px; border-radius: 20px; font-weight: bold; z-index: 1000; display: none; }
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--yellow); color: var(--black); padding: 10px 20px; border-radius: 20px; font-weight: bold; z-index: 1000; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         
         a { color: var(--yellow); }
     </style>
@@ -121,7 +135,6 @@
 
         let currentFilter = 'vše';
 
-        // Pomocník pro skloňování
         function getDeclension(n, [one, few, many]) {
             if (n === 1) return one;
             if (n >= 2 && n <= 4) return few;
@@ -171,18 +184,24 @@
                 cardDiv.className = `card card-${card.card_type || 'otázka'}`;
                 
                 const hlasSlovo = getDeclension(card.totalVotes, ['HLAS', 'HLASY', 'HLASŮ']);
-                const voteBtnHtml = card.hasVoted 
-                    ? `<button class="btn-vote btn-voted" disabled>✅ HLASOVÁNO</button>` 
-                    : `<button class="btn-vote" onclick="handleVote('${card.id}')">HLASOVAT</button>`;
+                
+                // Logika pro tlačítka (voted vs. normal)
+                let footerContent = `
+                    <div class="btn-group">
+                        <button class="btn-vote" onclick="handleVote('${card.id}')">HLASOVAT</button>
+                        <button class="btn-share" onclick="shareCard('${card.id}', '${card.title.replace(/'/g, "\\'")}')" title="Sdílet kartu">🔗</button>
+                    </div>`;
+                
+                if (card.hasVoted) {
+                    footerContent = `<div class="btn-group"><button class="btn-vote btn-voted" disabled>✅ HLASOVÁNO</button></div>`;
+                }
 
                 cardDiv.innerHTML = `
+                    <button class="report-btn" onclick="reportCard('${card.id}')" title="Nahlásit kartu">🚩</button>
                     <div class="vote-count">${card.totalVotes} ${hlasSlovo}</div>
                     <h3>${card.title}</h3>
                     <div class="card-footer">
-                        <div class="btn-group">
-                            ${voteBtnHtml}
-                            <button class="btn-share" onclick="shareCard('${card.id}', '${card.title.replace(/'/g, "\\'")}')" title="Sdílet kartu">🔗</button>
-                        </div>
+                        ${footerContent}
                         <span class="brand-subtext">KARTY BEZ CENZURY</span>
                     </div>
                 `;
@@ -190,10 +209,14 @@
             });
         }
 
+        function reportCard(id) {
+            alert("Díky za nahlášení, kartu zkontrolujeme. Dickobraz nesnáší špatný humor (pokud není dobrý).");
+        }
+
         async function shareCard(id, title) {
             const shareUrl = `${window.location.origin}${window.location.pathname}?cardId=${id}`;
             if (navigator.share) {
-                navigator.share({ title: 'Hlasuj pro tuto kartu v Dickobrazu!', text: title, url: shareUrl });
+                navigator.share({ title: 'Hlasuj pro Dickobraza!', text: title, url: shareUrl });
             } else {
                 navigator.clipboard.writeText(shareUrl);
                 const toast = document.getElementById('toast');
@@ -227,16 +250,17 @@
             const count = parseInt(localStorage.getItem('suggestionsCount') || '0');
             const remaining = 3 - count;
             const name = localStorage.getItem('userName');
+            const textEl = document.getElementById('suggestionText');
             
-            const nSlovo = getDeclension(remaining, ['návrh', 'návrhy', 'návrhů']);
-            const zSlovo = remaining === 1 ? 'Zbývá' : 'Zbývají';
-            
-            document.getElementById('suggestionText').innerHTML = `Ahoj <span style="color:var(--yellow)">${name}</span>! ${zSlovo} ti ještě <span style="color:var(--yellow)">${remaining}</span> ${nSlovo}.`;
-            
-            if (count >= 3) {
+            if (remaining === 0) {
+                textEl.innerHTML = `Ahoj <span style="color:var(--yellow)">${name}</span>! Máš vybráno! Všechny své návrhy jsi už vyčerpal.`;
                 const btn = document.getElementById('submitSuggestionBtn');
                 btn.style.background = '#555';
                 btn.innerText = 'LIMIT VYČERPÁN';
+            } else {
+                const nSlovo = getDeclension(remaining, ['návrh', 'návrhy', 'návrhů']);
+                const zSlovo = remaining === 1 ? 'Zbývá' : 'Zbývají';
+                textEl.innerHTML = `Ahoj <span style="color:var(--yellow)">${name}</span>! ${zSlovo} ti ještě <span style="color:var(--yellow)">${remaining}</span> ${nSlovo}.`;
             }
         }
 
