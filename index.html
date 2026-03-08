@@ -22,6 +22,8 @@
 
         /* Návrhová sekce */
         .add-suggestion { background: #1a1a1a; padding: 30px; border-radius: 15px; border: 3px dashed var(--yellow); margin-bottom: 40px; position: relative; }
+        
+        /* Promo box - nyní výraznější i na začátku */
         .promo-box { background: var(--yellow); color: var(--black); padding: 20px; border-radius: 15px; margin-bottom: 25px; text-align: center; border: 3px solid var(--white); }
         .promo-box h4 { margin: 0 0 10px 0; font-size: 1.2rem; text-transform: uppercase; }
         .promo-box p { margin: 0; font-weight: bold; font-size: 0.95rem; line-height: 1.4; }
@@ -44,6 +46,7 @@
         .card-odpověď { background: var(--white); border-color: var(--yellow); }
         .card h3 { margin: 0; font-size: 1.3rem; line-height: 1.25; font-weight: bold; word-wrap: break-word; padding-top: 10px; }
         .vote-count { position: absolute; top: 12px; right: 15px; font-size: 0.7rem; font-weight: 900; opacity: 0.6; }
+        
         .card-footer { margin-top: auto; padding-top: 15px; text-align: center; }
         .btn-group { display: flex; gap: 8px; margin-bottom: 8px; }
         .btn-vote { flex: 4; background: var(--black); color: var(--white); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
@@ -65,7 +68,12 @@
     <h1>⚡ ROZHODNI O NOVÉ EDICI ⚡</h1>
 
     <div id="userInfoSection" class="user-info-section">
-        <input type="email" id="userEmail" placeholder="Tvůj e-mail*">
+        <div class="promo-box">
+            <h4>🔥 KARTY S NEJVÍCE HLASY REÁLNĚ VYDÁME!</h4>
+            <p>Autoři vítězných karet dostanou novou edici ZDARMA a všichni zúčastnění získají 25% slevu na předprodej.</p>
+        </div>
+
+        <input type="email" id="userEmail" placeholder="Tvůj e-mail (abychom ti mohli poslat tu slevu)*">
         <input type="text" id="userName" placeholder="Tvé jméno nebo přezdívka">
         
         <label class="consent-container">
@@ -82,10 +90,10 @@
 
     <div id="suggestionForm" class="add-suggestion hidden">
         <div class="promo-box">
-            <h4>🔥 KARTY S NEJVÍCE HLASY REÁLNĚ VYDÁME!</h4>
-            <p>Autoři vítězných karet dostanou novou edici ZDARMA a všichni zúčastnění získají 15% slevu na předprodej.</p>
+            <h4>💡 NAVRHNI VLASTNÍ KARTU</h4>
+            <p>Máš šanci zapsat se do historie Dickobraza. <br>Vítězové berou hru zdarma!</p>
         </div>
-        <h3>💡 NAVRHNI VLASTNÍ KARTU</h3>
+
         <select id="newType">
             <option value="otázka">Typ: OTÁZKA (Žlutá karta)</option>
             <option value="odpověď">Typ: ODPOVĚĎ (Bílá karta)</option>
