@@ -6,7 +6,7 @@
     <title>Hlasování o nových kartách | Dickobraz</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --yellow: #fbda18; --black: #000000; --white: #ffffff; }
+        :root { --yellow: #fbda18; --black: #000000; --white: #ffffff; --grey: #555; }
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background: var(--black); color: var(--white); -webkit-font-smoothing: antialiased; }
         
         h1 { text-align: center; color: var(--yellow); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; font-weight: 900; }
@@ -37,32 +37,24 @@
         .card-otázka { background: var(--yellow); border-color: var(--black); }
         .card-odpověď { background: var(--white); border-color: var(--yellow); }
         
-        .card h3 { 
-            margin: 0; 
-            font-size: 1.3rem; 
-            line-height: 1.25; 
-            text-align: left; 
-            font-weight: bold;
-            word-wrap: break-word;
-            padding-top: 5px;
-        }
+        .card h3 { margin: 0; font-size: 1.3rem; line-height: 1.25; text-align: left; font-weight: bold; word-wrap: break-word; padding-top: 5px; }
         
         .vote-count { position: absolute; top: 12px; right: 15px; font-size: 0.7rem; font-weight: 900; opacity: 0.6; }
         
         .card-footer { margin-top: auto; padding-top: 15px; text-align: center; }
         
-        .btn-vote { width: 100%; background: var(--black); color: var(--white); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
+        .btn-vote { width: 100%; background: var(--black); color: var(--white); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; transition: 0.2s; }
+        .btn-voted { background: transparent !important; color: var(--black) !important; border: 2px solid var(--black) !important; cursor: default; }
+        
         .card-otázka .btn-vote { color: var(--yellow); }
         .card-odpověď .btn-vote { background: var(--yellow); color: var(--black); }
 
-        .brand-subtext { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 900; margin-top: 8px; display: block; }
+        .brand-subtext { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 900; margin-top: 8px; display: block; opacity: 0.8; }
         
         input, select, button.submit-btn { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: none; font-size: 1rem; box-sizing: border-box; }
         .submit-btn { background: var(--yellow); color: var(--black); font-weight: bold; text-transform: uppercase; cursor: pointer; border: 2px solid var(--black); }
-        .submit-btn:disabled { background: #555; color: #888; border-color: #444; cursor: not-allowed; }
         
         .add-suggestion { background: #1a1a1a; padding: 30px; border-radius: 15px; border: 3px dashed var(--yellow); margin-top: 50px; }
-        
         a { color: var(--yellow); }
     </style>
 </head>
@@ -80,7 +72,7 @@
     </div>
 
     <div id="welcomeBack" class="user-welcome hidden" style="text-align:center; margin-bottom:20px;">
-        <p>Ahoj <span id="displayUserName" style="color:var(--yellow)"></span>! Zbývá ti <span id="remainingSuggestions" style="color:var(--yellow)">3</span> návrhy.</p>
+        <p>Ahoj <span id="displayUserName" style="color:var(--yellow)"></span>! Zbývá ti <span id="remainingSuggestions" style="color:var(--yellow)">3</span> návrhů.</p>
     </div>
 
     <div class="controls">
@@ -125,18 +117,31 @@
 
         async function fetchCards() {
             const sortBy = document.getElementById('sortSelect').value;
+            const userEmail = localStorage.getItem('userEmail');
+
+            // 1. Načtení karet
             let query = _supabase.from('cards').select('*');
             if (currentFilter !== 'vše') query = query.eq('card_type', currentFilter);
-            
             const { data: cards } = await query;
+
+            // 2. Načtení počtu hlasů
             const { data: voteCounts } = await _supabase.from('card_votes_count').select('*');
 
+            // 3. Načtení hlasů aktuálního uživatele
+            let userVotes = [];
+            if (userEmail) {
+                const { data: votes } = await _supabase.from('votes').select('card_id').eq('user_email', userEmail);
+                userVotes = votes ? votes.map(v => v.card_id) : [];
+            }
+
+            // 4. Příprava dat pro zobrazení
             let cardsWithVotes = cards.map(card => ({
                 ...card,
-                votes: voteCounts?.find(v => v.card_id === card.id)?.total_votes || 0
+                totalVotes: voteCounts?.find(v => v.card_id === card.id)?.total_votes || 0,
+                hasVoted: userVotes.includes(card.id)
             }));
 
-            if (sortBy === 'popular') cardsWithVotes.sort((a, b) => b.votes - a.votes);
+            if (sortBy === 'popular') cardsWithVotes.sort((a, b) => b.totalVotes - a.totalVotes);
             else cardsWithVotes.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
             const container = document.getElementById('cardsList');
@@ -145,11 +150,17 @@
             cardsWithVotes.forEach(card => {
                 const cardDiv = document.createElement('div');
                 cardDiv.className = `card card-${card.card_type || 'otázka'}`;
+                
+                // Logika tlačítka
+                const buttonHtml = card.hasVoted 
+                    ? `<button class="btn-vote btn-voted" disabled>✅ HLASOVÁNO</button>` 
+                    : `<button class="btn-vote" onclick="handleVote('${card.id}')">HLASOVAT</button>`;
+
                 cardDiv.innerHTML = `
-                    <div class="vote-count">${card.votes} HLASŮ</div>
+                    <div class="vote-count">${card.totalVotes} HLASŮ</div>
                     <h3>${card.title}</h3>
                     <div class="card-footer">
-                        <button class="btn-vote" onclick="handleVote('${card.id}')">HLASOVAT</button>
+                        ${buttonHtml}
                         <span class="brand-subtext">KARTY BEZ CENZURY</span>
                     </div>
                 `;
@@ -165,6 +176,7 @@
             localStorage.setItem('userName', document.getElementById('userName').value || 'pařmene');
             if(!localStorage.getItem('suggestionsCount')) localStorage.setItem('suggestionsCount', '0');
             checkUser();
+            fetchCards(); // Znovu načíst karty, aby se ukázalo, kde už hlasoval
         }
 
         function checkUser() {
@@ -180,15 +192,7 @@
 
         function updateSuggestionCountDisplay() {
             const count = parseInt(localStorage.getItem('suggestionsCount') || '0');
-            const remaining = Math.max(0, 3 - count);
-            document.getElementById('remainingSuggestions').innerText = remaining;
-            
-            if (count >= 3) {
-                const btn = document.getElementById('submitSuggestionBtn');
-                btn.style.background = '#555';
-                btn.style.color = '#888';
-                btn.innerText = 'LIMIT VYČERPÁN';
-            }
+            document.getElementById('remainingSuggestions').innerText = Math.max(0, 3 - count);
         }
 
         async function handleVote(cardId) {
@@ -198,30 +202,21 @@
                 card_id: cardId, user_email: email, user_name: localStorage.getItem('userName'), marketing_consent: true
             }]);
             if (error) alert(error.code === '23505' ? 'Už jsi hlasoval!' : 'Chyba: ' + error.message);
-            else { alert('Hlas přijat!'); fetchCards(); }
+            else { fetchCards(); }
         }
 
         async function suggestCard() {
             const count = parseInt(localStorage.getItem('suggestionsCount') || '0');
-            
-            // TADY JE TA HLÁŠKA
-            if (count >= 3) {
-                alert("Tvůj limit pro návrhy je vyčerpán, zkus požádat tvojí mámu, aby vyplnila další návrhy za tebe.");
-                return;
-            }
-
+            if (count >= 3) { alert("Tvůj limit pro návrhy je vyčerpán, zkus požádat tvojí mámu, aby vyplnila další návrhy za tebe."); return; }
             const title = document.getElementById('newTitle').value;
-            if (!title) { alert("Napiš nejdřív text karty!"); return; }
-
+            if (!title) return;
             const { error } = await _supabase.from('cards').insert([{
                 title: title, card_type: document.getElementById('newType').value, is_official: false
             }]);
-
             if (!error) {
                 localStorage.setItem('suggestionsCount', (count + 1).toString());
                 document.getElementById('newTitle').value = '';
                 updateSuggestionCountDisplay();
-                alert('Návrh odeslán! Úspěšně jsi Dickobrazovi zavařil mozek.');
                 fetchCards();
             }
         }
