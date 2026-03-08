@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>ADMIN | Dickobraz</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; padding: 20px; }
+        .admin-box { background: #111; padding: 20px; border-radius: 10px; border: 2px solid #fbda18; margin-bottom: 20px; text-align: center; }
+        .card-row { background: #222; margin-bottom: 10px; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-del { background: #ff4444; border: none; color: white; padding: 8px; cursor: pointer; border-radius: 5px; }
+        .btn-ok { background: #00ff00; border: none; color: black; padding: 8px; cursor: pointer; border-radius: 5px; font-weight: bold; }
+        .official { color: #00ff00; font-weight: bold; font-size: 0.8rem; margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <div class="admin-box">
+        <h2>DICKOBRAZ ADMIN PULT</h2>
+        <input type="password" id="pass" placeholder="Master Key" style="padding: 10px;" oninput="loadAdmin()">
+    </div>
+
+    <div id="adminList"></div>
+
+    <script>
+        const _supabase = supabase.createClient('https://lixnqbjlozrqceixmbft.supabase.co', 'sb_publishable_vGycWa1bjT2riAUXTT6pNA_xjRvPHeP');
+        
+        async function loadAdmin() {
+            if (document.getElementById('pass').value !== 'dikobraz2024') return;
+            
+            const { data: cards } = await _supabase.from('cards').select('*').order('created_at', { ascending: false });
+            const list = document.getElementById('adminList');
+            list.innerHTML = '';
+
+            cards.forEach(card => {
+                const row = document.createElement('div');
+                row.className = 'card-row';
+                row.innerHTML = `
+                    <div>
+                        ${card.is_official ? '<span class="official">[OFICIÁLNÍ]</span>' : ''}
+                        <strong>${card.title}</strong> (${card.card_type})
+                    </div>
+                    <div>
+                        <button class="btn-ok" onclick="approve('${card.id}')">SCHVÁLIT</button>
+                        <button class="btn-del" onclick="remove('${card.id}')">SMAZAT</button>
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        async function approve(id) {
+            await _supabase.from('cards').update({ is_official: true }).eq('id', id);
+            loadAdmin();
+        }
+
+        async function remove(id) {
+            if (confirm('Fakt smazat?')) {
+                await _supabase.from('cards').delete().eq('id', id);
+                loadAdmin();
+            }
+        }
+    </script>
+</body>
+</html>
