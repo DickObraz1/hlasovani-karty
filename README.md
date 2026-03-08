@@ -1,0 +1,1 @@
+# hlasovani-karty
