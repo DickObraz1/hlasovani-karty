@@ -163,43 +163,26 @@
 
         // --- ECOMAIL INTEGRATION ---
 async function subscribeToEcomail(email, name) {
-    const API_KEY = '620170f3ecd7f620170f3ecd81'; 
-    const LIST_ID = '19';
     const cleanEmail = email.trim().toLowerCase();
 
-    // Tady je ten trik - pošleme to přes "most", který prohlížeč neblokuje
-    const proxyUrl = 'https://corsproxy.io/?';
-    const targetUrl = `https://api2.ecomailapp.cz/lists/${LIST_ID}/subscribe`;
-
     try {
-        const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json', 
-                'key': API_KEY 
-            },
-            body: JSON.stringify({
-                "contact": { 
-                    "email": cleanEmail, 
-                    "name": name,
-                    "surname": "Soutěžící"
-                },
-                "update_existing": true,
-                "resubscribe": true,
-                "trigger_autoresponders": true
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (!response.ok) {
-            console.error("Ecomail Error detail:", result);
+        // Tady voláme tvou Supabase tabulku, ne Ecomail
+        const { error } = await _supabase
+            .from('contestants')
+            .insert([{ email: cleanEmail, name: name }]);
+
+        if (error) {
+            if (error.code === '23505') {
+                console.log("Ten prďola už v databázi je, to neva.");
+            } else {
+                console.error("Chyba při ukládání kontaktu:", error.message);
+            }
         } else {
-            console.log("VÍTĚZSTVÍ! Teď už bys ten mail měl v Ecomailu vidět.");
+            console.log("Kontakt úspěšně uložen do Supabase!");
             showToast("Mrkni do mailu a potvrď účast! 📧");
         }
-    } catch (err) { 
-        console.error('Chyba spojení:', err); 
+    } catch (err) {
+        console.error('Kritická chyba:', err);
     }
 }
         // --- SPAM TEST ---
