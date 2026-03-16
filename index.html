@@ -14,8 +14,10 @@
         .user-info-section { background: #1a1a1a; padding: 25px; border-radius: 15px; border: 2px solid var(--yellow); margin-bottom: 30px; }
         .hidden { display: none; }
         
-        /* Anti-spam Honeypot (skryté pro lidi) */
+        /* Anti-spam */
         .hp-field { opacity: 0; position: absolute; top: 0; left: 0; height: 0; width: 0; z-index: -1; }
+        .spam-test-box { background: #222; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #333; }
+        .spam-test-box label { font-size: 0.9rem; color: var(--yellow); display: block; margin-bottom: 8px; font-weight: bold; }
 
         .consent-container { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; cursor: pointer; }
         .consent-container input[type="checkbox"] { width: 20px !important; height: 20px !important; margin: 0 !important; cursor: pointer; flex-shrink: 0; }
@@ -99,6 +101,11 @@
         <input type="email" id="userEmail" placeholder="Tvůj e-mail (pro zaslání výhry a slevy)*">
         <input type="text" id="userName" placeholder="Tvé jméno nebo přezdívka">
         
+        <div class="spam-test-box">
+            <label id="spamQuestionLabel">Načítám kontrolní otázku...</label>
+            <input type="text" id="spamAnswerInput" placeholder="Tvoje odpověď (číslem)">
+        </div>
+
         <input type="text" id="hp_name" class="hp-field" tabindex="-1" autocomplete="off">
 
         <label class="consent-container">
@@ -148,7 +155,22 @@
     <script>
         const _supabase = supabase.createClient('https://lixnqbjlozrqceixmbft.supabase.co', 'sb_publishable_vGycWa1bjT2riAUXTT6pNA_xjRvPHeP');
         let currentFilter = 'vše';
-        let pageLoadTime = Date.now(); // Čas načtení stránky pro Anti-spam
+        let pageLoadTime = Date.now();
+        
+        // KONFIGURACE SPAM TESTU
+        const spamQuestions = [
+            { q: "Kolik máš rukou, pokud jsi zrovna neutekl z pily?", a: "2" },
+            { q: "Kolik má průměrný muž koulí, pokud mu je stará zrovna neuřízla?", a: "2" },
+            { q: "Kolik rohů má stůl, do kterého v noci pravidelně narážíš malíčkem?", a: "4" },
+            { q: "Kolik prstů ti ukazuje průměrný řidič v Praze, když ho omylem vybrzdíš?", a: "1" },
+            { q: "Kolik piv tvoří ‚jedno vychlazené‘, když se tě manželka ptá, kam jdeš?", a: "1" }
+        ];
+        let currentSpamChallenge = null;
+
+        function initSpamTest() {
+            currentSpamChallenge = spamQuestions[Math.floor(Math.random() * spamQuestions.length)];
+            document.getElementById('spamQuestionLabel').innerText = currentSpamChallenge.q;
+        }
 
         function toggleRules() {
             const modal = document.getElementById('rulesModal');
@@ -272,8 +294,7 @@
         }
 
         async function suggestCard() {
-            // ANTI-SPAM CHECK
-            if (document.getElementById('hp_title').value) return; // Honeypot
+            if (document.getElementById('hp_title').value) return;
             if (Date.now() - pageLoadTime < 3000) { alert("Sypeš to tam moc rychle, nejsi robot?"); return; }
 
             const email = localStorage.getItem('userEmail');
@@ -306,8 +327,16 @@
         }
 
         function saveUser() {
-            // ANTI-SPAM CHECK
-            if (document.getElementById('hp_name').value) return; // Honeypot
+            // SPAM TEST VALIDACE
+            const spamAnswer = document.getElementById('spamAnswerInput').value.trim();
+            if (spamAnswer !== currentSpamChallenge.a) {
+                alert("Matika ti ve škole moc nešla, co? Zkus tu kontrolní otázku znovu.");
+                initSpamTest(); // Obměníme otázku
+                document.getElementById('spamAnswerInput').value = "";
+                return;
+            }
+
+            if (document.getElementById('hp_name').value) return;
             if (Date.now() - pageLoadTime < 2000) { alert("To bylo až podezřele rychlé..."); return; }
 
             const email = document.getElementById('userEmail').value;
@@ -351,7 +380,11 @@
             showToast("Odkaz zkopírován! 🚀");
         }
 
-        window.onload = () => { checkUser(); fetchCards(); };
+        window.onload = () => { 
+            checkUser(); 
+            fetchCards();
+            initSpamTest(); // Načte náhodnou otázku při startu
+        };
         window.onclick = function(event) {
             if (event.target == document.getElementById('rulesModal')) document.getElementById('rulesModal').style.display = "none";
         }
