@@ -9,15 +9,8 @@
         :root { --yellow: #fbda18; --black: #000000; --white: #ffffff; --dark-grey: #444; --error: #ff4444; }
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background: var(--black); color: var(--white); -webkit-font-smoothing: antialiased; }
         
-        h1 { text-align: center; color: var(--yellow); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; font-weight: 900; }
+        h1 { text-align: center; color: var(--yellow); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; font-weight: 900; }
         
-        /* COUNTDOWN STYLE */
-        #countdown-section { text-align: center; margin-bottom: 30px; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 2px solid var(--yellow); }
-        #countdown-section h2 { font-size: 1rem; text-transform: uppercase; margin-bottom: 15px; color: #fff; letter-spacing: 1px; }
-        .timer { display: flex; justify-content: center; gap: 15px; font-weight: 900; color: var(--yellow); font-size: 1.8rem; }
-        .timer div { display: flex; flex-direction: column; align-items: center; }
-        .timer span { font-size: 0.6rem; color: #fff; text-transform: uppercase; font-weight: normal; margin-top: 5px; }
-
         .user-info-section { background: #1a1a1a; padding: 25px; border-radius: 15px; border: 2px solid var(--yellow); margin-bottom: 30px; }
         .hidden { display: none !important; }
         
@@ -71,16 +64,6 @@
 
     <h1>⚡ ROZHODNI O NOVÉ EDICI ⚡</h1>
 
-    <div id="countdown-section">
-        <h2 id="countdown-label">Vypukne to za:</h2>
-        <div class="timer">
-            <div><div id="days">00</div><span>Dní</span></div>
-            <div><div id="hours">00</div><span>Hod</span></div>
-            <div><div id="minutes">00</div><span>Min</span></div>
-            <div><div id="seconds">00</div><span>Sek</span></div>
-        </div>
-    </div>
-
     <div id="main-content">
         <div id="userInfoSection" class="user-info-section">
             <div class="promo-box">
@@ -120,7 +103,7 @@
                 <option value="otázka">Typ: OTÁZKA (Žlutá karta)</option>
                 <option value="odpověď">Typ: ODPOVĚĎ (Bílá karta)</option>
             </select>
-            <input type="text" id="newTitle" maxlength="120" oninput="updateCharCount(this)" placeholder="Napiš sem něco, za co se budeš zítra stydět...">
+            <input type="text" id="newTitle" maxlength="120" oninput="updateCharCount(this)" placeholder="Např.: Kdybys mohl vymazat jednu věc ze světa, co by to bylo?">
             <input type="text" id="hp_title" class="hp-field" tabindex="-1" autocomplete="off">
             <div class="char-counter" id="charCount">0/120</div>
             <button id="submitSuggestionBtn" onclick="suggestCard()" class="submit-btn">ODESLAT NÁVRH</button>
@@ -168,8 +151,7 @@
             <p>Sleva ti přijde na mail 15. 8. 2026, nejde kombinovat s dalšími akcemi a platí jen po dobu předprodeje.</p>
             <h3>Důležitá věc, ať pak není brekot</h3>
             <p>Hlasy od lidí bereme jako doporučení komunity. Finální výběr vítězných návrhů dělá DickObraz podle hlasů, originality, vtipnosti a toho, jestli ta karta fakt stojí za to.</p>
-            <p>Kdy to běží? Soutěž běží od 1. 4. 2026 do 31. 5. 2026. Výherce oznámíme během července 2026.</p>
-            <p>Co se stane s tvým návrhem? Když nám pošleš návrh, dáváš nám souhlas ho použít, upravit a klidně z něj udělat reálnou kartu do hry.</p>
+            <p>Soutěž běží od 1. 4. 2026 do 31. 5. 2026. Výherce oznámíme během července 2026.</p>
             <p>Pokud si právník a chceš si přečíst full pravidla, tak <a href="https://www.dickobraz.cz/a/pravidla-spotrebitelske-souteze" target="_blank">zde</a>.</p>
         </div>
     </div>
@@ -178,34 +160,11 @@
         const _supabase = supabase.createClient('https://lixnqbjlozrqceixmbft.supabase.co', 'sb_publishable_vGycWa1bjT2riAUXTT6pNA_xjRvPHeP');
         let currentFilter = 'vše';
         let pageLoadTime = Date.now();
-        const START_DATE = new Date("April 1, 2026 00:00:00").getTime();
-        
-        // --- COUNTDOWN LOGIC ---
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const distance = START_DATE - now;
-            if (distance < 0) {
-                document.getElementById("countdown-section").classList.add("hidden");
-                document.getElementById("main-content").classList.remove("hidden");
-                return;
-            }
-            document.getElementById("main-content").classList.add("hidden");
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            document.getElementById("days").innerText = days.toString().padStart(2, '0');
-            document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
-            document.getElementById("minutes").innerText = minutes.toString().padStart(2, '0');
-            document.getElementById("seconds").innerText = seconds.toString().padStart(2, '0');
-        }
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
 
         // --- ECOMAIL INTEGRATION ---
         async function subscribeToEcomail(email, name) {
             const API_KEY = '620170f3ecd7f620170f3ecd81'; 
-            const LIST_ID = '9'; // <--- TADY DOPLŇ ČÍSLO SEZNAMU Z ECOMAILU
+            const LIST_ID = '9'; // Nastaveno napevno
             try {
                 await fetch(`https://api2.ecomailapp.cz/lists/${LIST_ID}/subscribe`, {
                     method: 'POST',
