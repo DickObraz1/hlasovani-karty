@@ -9,10 +9,17 @@
         :root { --yellow: #fbda18; --black: #000000; --white: #ffffff; --dark-grey: #444; --error: #ff4444; }
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background: var(--black); color: var(--white); -webkit-font-smoothing: antialiased; }
         
-        h1 { text-align: center; color: var(--yellow); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; font-weight: 900; }
+        h1 { text-align: center; color: var(--yellow); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; font-weight: 900; }
         
+        /* COUNTDOWN STYLE */
+        #countdown-section { text-align: center; margin-bottom: 30px; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 2px solid var(--yellow); }
+        #countdown-section h2 { font-size: 1rem; text-transform: uppercase; margin-bottom: 15px; color: #fff; letter-spacing: 1px; }
+        .timer { display: flex; justify-content: center; gap: 15px; font-weight: 900; color: var(--yellow); font-size: 1.8rem; }
+        .timer div { display: flex; flex-direction: column; align-items: center; }
+        .timer span { font-size: 0.6rem; color: #fff; text-transform: uppercase; font-weight: normal; margin-top: 5px; }
+
         .user-info-section { background: #1a1a1a; padding: 25px; border-radius: 15px; border: 2px solid var(--yellow); margin-bottom: 30px; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         
         /* Anti-spam */
         .hp-field { opacity: 0; position: absolute; top: 0; left: 0; height: 0; width: 0; z-index: -1; }
@@ -24,7 +31,6 @@
         .consent-text { font-size: 0.85rem; line-height: 1.3; text-align: left; color: var(--white); }
 
         .add-suggestion { background: #1a1a1a; padding: 30px; border-radius: 15px; border: 3px dashed var(--yellow); margin-bottom: 40px; position: relative; }
-        
         .promo-box { background: var(--yellow); color: var(--black); padding: 20px; border-radius: 15px; margin-bottom: 25px; text-align: center; border: 3px solid var(--white); }
         .promo-box h4 { margin: 0 0 10px 0; font-size: 1.2rem; text-transform: uppercase; }
         .promo-box p { margin: 0; font-weight: bold; font-size: 0.95rem; line-height: 1.4; }
@@ -36,16 +42,7 @@
         .modal-content { background: #1a1a1a; margin: 5% auto; padding: 30px; border: 2px solid var(--yellow); border-radius: 15px; max-width: 650px; color: #fff; line-height: 1.6; position: relative; }
         .close-modal { position: absolute; top: 15px; right: 20px; font-size: 30px; color: var(--yellow); cursor: pointer; font-weight: bold; }
         .modal h2, .modal h3 { color: var(--yellow); text-transform: uppercase; margin-top: 20px; margin-bottom: 10px; }
-        .modal h2:first-of-type { margin-top: 0; }
-        .modal p { margin-bottom: 15px; font-size: 0.95rem; }
-        .modal ul { padding-left: 20px; margin-bottom: 20px; }
-        .modal li { margin-bottom: 8px; font-size: 0.95rem; }
-
-        .controls { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; padding-top: 10px; border-top: 1px solid #333; }
-        .filter-group button { background: #333; color: white; border: 1px solid var(--yellow); padding: 8px 15px; cursor: pointer; border-radius: 5px; font-weight: bold; }
-        .filter-group button.active { background: var(--yellow); color: var(--black); }
-        .sort-group select { background: #333; color: white; border: 1px solid var(--yellow); padding: 8px; border-radius: 5px; }
-
+        
         #cardsList { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
         .card { aspect-ratio: 2.5/3.5; padding: 20px; border-radius: 14px; display: flex; flex-direction: column; justify-content: flex-start; color: var(--black); box-shadow: 0 8px 20px rgba(0,0,0,0.5); position: relative; border: 4px solid transparent; box-sizing: border-box; transition: 0.3s; }
         .card:hover { transform: translateY(-5px); }
@@ -54,14 +51,15 @@
         .card h3 { margin: 0; font-size: 1.3rem; line-height: 1.25; font-weight: bold; word-wrap: break-word; padding-top: 10px; }
         .vote-count { position: absolute; top: 12px; right: 15px; font-size: 0.7rem; font-weight: 900; opacity: 0.6; }
         .card-footer { margin-top: auto; padding-top: 15px; text-align: center; }
+        
         .btn-group { display: flex; gap: 8px; margin-bottom: 8px; }
         .btn-vote { flex: 4; background: var(--black); color: var(--white); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
         .btn-voted { background: rgba(0,0,0,0.1) !important; color: var(--black) !important; border: 3px solid var(--black) !important; cursor: default; flex: 5; }
         .btn-share { flex: 1; background: transparent; border: 2px solid var(--black); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
-        .brand-subtext { font-size: 0.55rem; text-transform: uppercase; font-weight: 900; opacity: 0.8; }
         
         input, select, .submit-btn { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: none; font-size: 1rem; box-sizing: border-box; }
         .submit-btn { background: var(--yellow); color: var(--black); font-weight: bold; text-transform: uppercase; cursor: pointer; border: 2px solid var(--black); }
+        .submit-btn:disabled { background: #555; cursor: not-allowed; }
         .char-counter { text-align: right; margin-top: -10px; margin-bottom: 10px; font-size: 0.75rem; color: #888; font-weight: bold; }
         #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--yellow); color: var(--black); padding: 10px 20px; border-radius: 20px; font-weight: bold; z-index: 1000; display: none; }
         a { color: var(--yellow); }
@@ -71,12 +69,85 @@
 
     <div id="toast"></div>
 
+    <h1>⚡ ROZHODNI O NOVÉ EDICI ⚡</h1>
+
+    <div id="countdown-section">
+        <h2 id="countdown-label">Vypukne to za:</h2>
+        <div class="timer">
+            <div><div id="days">00</div><span>Dní</span></div>
+            <div><div id="hours">00</div><span>Hod</span></div>
+            <div><div id="minutes">00</div><span>Min</span></div>
+            <div><div id="seconds">00</div><span>Sek</span></div>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div id="userInfoSection" class="user-info-section">
+            <div class="promo-box">
+                <h4>🔥 KARTY S NEJVÍCE HLASY REÁLNĚ VYDÁME!</h4>
+                <p>Autoři vítězných karet dostanou balíčky ZDARMA a všichni zúčastnění získají 30% slevu na předprodej.</p>
+            </div>
+
+            <input type="email" id="userEmail" placeholder="Tvůj e-mail (pro zaslání výhry a slevy)*">
+            <input type="text" id="userName" placeholder="Tvé jméno nebo přezdívka">
+            
+            <div class="spam-test-box">
+                <label id="spamQuestionLabel">Načítám kontrolní otázku...</label>
+                <input type="text" id="spamAnswerInput" placeholder="Tvoje odpověď (číslem)">
+            </div>
+
+            <input type="text" id="hp_name" class="hp-field" tabindex="-1" autocomplete="off">
+
+            <label class="consent-container">
+                <input type="checkbox" id="marketingConsent">
+                <span class="consent-text">Souhlasím s <span onclick="toggleRules()" style="text-decoration: underline; cursor:pointer;">pravidly soutěže</span> a se <a href="https://www.dickobraz.cz/podminky-ochrany-osobnich-udaju" target="_blank">zpracováním údajů.</a></span>
+            </label>
+
+            <button onclick="saveUser()" class="submit-btn">POTVRDIT A ZAČÍT SYPAT NÁVRHY</button>
+        </div>
+
+        <div id="welcomeBack" class="user-welcome hidden" style="text-align:center;">
+            <p id="suggestionText"></p>
+            <p id="votesLeftText" style="font-size: 0.9rem; opacity: 0.8;"></p>
+        </div>
+
+        <div id="suggestionForm" class="add-suggestion hidden">
+            <div class="promo-box">
+                <h4>💡 NAVRHNI VLASTNÍ KARTU</h4>
+                <p>Vítězové berou hru a rozšíření zdarma!</p>
+            </div>
+            <select id="newType">
+                <option value="otázka">Typ: OTÁZKA (Žlutá karta)</option>
+                <option value="odpověď">Typ: ODPOVĚĎ (Bílá karta)</option>
+            </select>
+            <input type="text" id="newTitle" maxlength="120" oninput="updateCharCount(this)" placeholder="Napiš sem něco, za co se budeš zítra stydět...">
+            <input type="text" id="hp_title" class="hp-field" tabindex="-1" autocomplete="off">
+            <div class="char-counter" id="charCount">0/120</div>
+            <button id="submitSuggestionBtn" onclick="suggestCard()" class="submit-btn">ODESLAT NÁVRH</button>
+        </div>
+
+        <span class="rules-link" onclick="toggleRules()">Zobrazit kompletní pravidla soutěže</span>
+
+        <div class="controls">
+            <div class="filter-group" id="filterGroup">
+                <button class="active" onclick="setFilter('vše', this)">VŠE</button>
+                <button onclick="setFilter('otázka', this)">OTÁZKY</button>
+                <button onclick="setFilter('odpověď', this)">ODPOVĚDI</button>
+            </div>
+            <select id="sortSelect" onchange="fetchCards()" style="width: auto; margin-bottom: 0;">
+                <option value="newest">Nejnovější</option>
+                <option value="popular">Podle hlasů</option>
+            </select>
+        </div>
+
+        <div id="cardsList"></div>
+    </div>
+
     <div id="rulesModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="toggleRules()">&times;</span>
             <h2>Vymysli kartu. Prohlasuj ji. Možná vyhraješ.</h2>
             <p>DickObraz spouští soutěž o nové Karty bez cenzury — a tentokrát do toho můžeš kecat i ty.</p>
-
             <h3>Jak to funguje?</h3>
             <ul>
                 <li>Zapojit se může každý 18+</li>
@@ -85,7 +156,6 @@
                 <li>Poslat můžeš až 3 vlastní návrhy</li>
                 <li>Každý se může zapojit jen jednou</li>
             </ul>
-
             <h3>Co můžeš vyhrát?</h3>
             <ul>
                 <li><strong>3× hlavní cena:</strong> Základní balíček + Rozšíření Mezi nohama + nové rozšíření</li>
@@ -93,94 +163,64 @@
                 <li><strong>10× třetí cena:</strong> Nové rozšíření</li>
             </ul>
             <p>Jeden člověk může vyhrát maximálně jednu výhru.</p>
-
             <h3>Bonus za vlastní nápad</h3>
             <p>Pošli aspoň 1 platný návrh karty a dostaneš 30% slevu na předprodej Karet bez cenzury.</p>
             <p>Sleva ti přijde na mail 15. 8. 2026, nejde kombinovat s dalšími akcemi a platí jen po dobu předprodeje.</p>
-
             <h3>Důležitá věc, ať pak není brekot</h3>
             <p>Hlasy od lidí bereme jako doporučení komunity. Finální výběr vítězných návrhů dělá DickObraz podle hlasů, originality, vtipnosti a toho, jestli ta karta fakt stojí za to.</p>
-            <p>Když někdo bude šmelit s hlasováním, fake maily nebo dělat jiný opičárny, můžeme ho bez milosti vyhodit.</p>
-
-            <h3>Kdy to běží?</h3>
-            <p>Soutěž běží od 1. 4. 2026 do 31. 5. 2026. Výherce oznámíme během července 2026.</p>
-
-            <h3>Co se stane s tvým návrhem?</h3>
-            <p>Když nám pošleš návrh, dáváš nám souhlas ho použít, upravit a klidně z něj udělat reálnou kartu do hry.</p>
-
-            <h3>A klasika na závěr</h3>
-            <p>Pořadatel si vyhrazuje právo soutěž změnit, přerušit nebo zrušit. Zapojením do soutěže souhlasíš s pravidly a se zpracováním osobních údajů pro účely soutěže.</p>
+            <p>Kdy to běží? Soutěž běží od 1. 4. 2026 do 31. 5. 2026. Výherce oznámíme během července 2026.</p>
+            <p>Co se stane s tvým návrhem? Když nám pošleš návrh, dáváš nám souhlas ho použít, upravit a klidně z něj udělat reálnou kartu do hry.</p>
             <p>Pokud si právník a chceš si přečíst full pravidla, tak <a href="https://www.dickobraz.cz/a/pravidla-spotrebitelske-souteze" target="_blank">zde</a>.</p>
         </div>
     </div>
-
-    <h1>⚡ ROZHODNI O NOVÉ EDICI ⚡</h1>
-
-    <div id="userInfoSection" class="user-info-section">
-        <div class="promo-box">
-            <h4>🔥 KARTY S NEJVÍCE HLASY REÁLNĚ VYDÁME!</h4>
-            <p>Autoři vítězných karet dostanou balíčky ZDARMA a všichni zúčastnění získají 30% slevu na předprodej.</p>
-        </div>
-
-        <input type="email" id="userEmail" placeholder="Tvůj e-mail (pro zaslání výhry a slevy)*">
-        <input type="text" id="userName" placeholder="Tvé jméno nebo přezdívka">
-        
-        <div class="spam-test-box">
-            <label id="spamQuestionLabel">Načítám kontrolní otázku...</label>
-            <input type="text" id="spamAnswerInput" placeholder="Tvoje odpověď (číslem)">
-        </div>
-
-        <input type="text" id="hp_name" class="hp-field" tabindex="-1" autocomplete="off">
-
-        <label class="consent-container">
-            <input type="checkbox" id="marketingConsent">
-            <span class="consent-text">Souhlasím s <span onclick="toggleRules()" style="text-decoration: underline; cursor:pointer;">pravidly soutěže</span> a se <a href="https://www.dickobraz.cz/podminky-ochrany-osobnich-udaju" target="_blank">zpracováním údajů.</a></span>
-        </label>
-
-        <button onclick="saveUser()" class="submit-btn">POTVRDIT A ZAČÍT SYPAT NÁVRHY</button>
-    </div>
-
-    <div id="welcomeBack" class="user-welcome hidden" style="text-align:center;">
-        <p id="suggestionText"></p>
-        <p id="votesLeftText" style="font-size: 0.9rem; opacity: 0.8;"></p>
-    </div>
-
-    <div id="suggestionForm" class="add-suggestion hidden">
-        <div class="promo-box">
-            <h4>💡 NAVRHNI VLASTNÍ KARTU</h4>
-            <p>Vítězové berou hru a rozšíření zdarma!</p>
-        </div>
-        <select id="newType">
-            <option value="otázka">Typ: OTÁZKA (Žlutá karta)</option>
-            <option value="odpověď">Typ: ODPOVĚĎ (Bílá karta)</option>
-        </select>
-        <input type="text" id="newTitle" maxlength="120" oninput="updateCharCount(this)" placeholder="Napiš sem něco, za co se budeš zítra stydět...">
-        <input type="text" id="hp_title" class="hp-field" tabindex="-1" autocomplete="off">
-        <div class="char-counter" id="charCount">0/120</div>
-        <button id="submitSuggestionBtn" onclick="suggestCard()" class="submit-btn">ODESLAT NÁVRH</button>
-    </div>
-
-    <span class="rules-link" onclick="toggleRules()">Zobrazit kompletní pravidla soutěže</span>
-
-    <div class="controls">
-        <div class="filter-group" id="filterGroup">
-            <button class="active" onclick="setFilter('vše', this)">VŠE</button>
-            <button onclick="setFilter('otázka', this)">OTÁZKY</button>
-            <button onclick="setFilter('odpověď', this)">ODPOVĚDI</button>
-        </div>
-        <select id="sortSelect" onchange="fetchCards()" style="width: auto; margin-bottom: 0;">
-            <option value="newest">Nejnovější</option>
-            <option value="popular">Podle hlasů</option>
-        </select>
-    </div>
-
-    <div id="cardsList"></div>
 
     <script>
         const _supabase = supabase.createClient('https://lixnqbjlozrqceixmbft.supabase.co', 'sb_publishable_vGycWa1bjT2riAUXTT6pNA_xjRvPHeP');
         let currentFilter = 'vše';
         let pageLoadTime = Date.now();
+        const START_DATE = new Date("April 1, 2026 00:00:00").getTime();
         
+        // --- COUNTDOWN LOGIC ---
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = START_DATE - now;
+            if (distance < 0) {
+                document.getElementById("countdown-section").classList.add("hidden");
+                document.getElementById("main-content").classList.remove("hidden");
+                return;
+            }
+            document.getElementById("main-content").classList.add("hidden");
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            document.getElementById("days").innerText = days.toString().padStart(2, '0');
+            document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
+            document.getElementById("minutes").innerText = minutes.toString().padStart(2, '0');
+            document.getElementById("seconds").innerText = seconds.toString().padStart(2, '0');
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // --- ECOMAIL INTEGRATION ---
+        async function subscribeToEcomail(email, name) {
+            const API_KEY = '620170f3ecd7f620170f3ecd81'; 
+            const LIST_ID = '9'; // <--- TADY DOPLŇ ČÍSLO SEZNAMU Z ECOMAILU
+            try {
+                await fetch(`https://api2.ecomailapp.cz/lists/${LIST_ID}/subscribe`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'key': API_KEY },
+                    body: JSON.stringify({
+                        "contact": { "email": email, "name": name },
+                        "trigger_autoresponders": true,
+                        "update_existing": true,
+                        "resubscribe": true
+                    })
+                });
+            } catch (err) { console.error('Ecomail Error:', err); }
+        }
+
+        // --- SPAM TEST ---
         const spamQuestions = [
             { q: "Kolik máš rukou, pokud jsi zrovna neutekl z pily?", a: "2" },
             { q: "Kolik má průměrný muž koulí, pokud mu je stará zrovna neuřízla?", a: "2" },
@@ -207,71 +247,38 @@
             return many;
         }
 
-        function updateCharCount(el) {
-            document.getElementById('charCount').innerText = `${el.value.length}/120`;
-        }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg; t.style.display = 'block';
-            setTimeout(() => t.style.display='none', 2500);
-        }
-
-        function setFilter(type, btn) {
-            currentFilter = type;
-            document.querySelectorAll('#filterGroup button').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            fetchCards();
-        }
+        function updateCharCount(el) { document.getElementById('charCount').innerText = `${el.value.length}/120`; }
+        function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display='none', 2500); }
+        function setFilter(type, btn) { currentFilter = type; document.querySelectorAll('#filterGroup button').forEach(b => b.classList.remove('active')); btn.classList.add('active'); fetchCards(); }
 
         async function fetchCards() {
             const sortBy = document.getElementById('sortSelect').value;
             const userEmail = localStorage.getItem('userEmail');
-            const urlParams = new URLSearchParams(window.location.search);
-            const highlightId = urlParams.get('cardId');
-
             let query = _supabase.from('cards').select('*');
             if (currentFilter !== 'vše') query = query.eq('card_type', currentFilter);
-            
             const { data: cards } = await query;
             const { data: voteCounts } = await _supabase.from('card_votes_count').select('*');
-
             let userVotes = [];
             if (userEmail) {
                 const { data: votes } = await _supabase.from('votes').select('card_id').eq('user_email', userEmail);
                 userVotes = votes ? votes.map(v => v.card_id) : [];
                 const left = 5 - userVotes.length;
-                const vSlovo = getDeclension(left, ['hlas', 'hlasy', 'hlasů']);
-                document.getElementById('votesLeftText').innerText = `Máš ještě ${left} ${vSlovo} k rozdělení.`;
+                document.getElementById('votesLeftText').innerText = `Máš ještě ${left} ${getDeclension(left, ['hlas', 'hlasy', 'hlasů'])} k rozdělení.`;
             }
-
-            let cardsWithVotes = cards.map(card => ({
+            let cardsWithVotes = cards ? cards.map(card => ({
                 ...card,
                 totalVotes: voteCounts?.find(v => v.card_id === card.id)?.total_votes || 0,
                 hasVoted: userVotes.includes(card.id)
-            }));
-
+            })) : [];
             if (sortBy === 'popular') cardsWithVotes.sort((a, b) => b.totalVotes - a.totalVotes);
             else cardsWithVotes.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-            if (highlightId) {
-                const hIdx = cardsWithVotes.findIndex(c => c.id == highlightId);
-                if (hIdx > -1) {
-                    const [hCard] = cardsWithVotes.splice(hIdx, 1);
-                    cardsWithVotes.unshift(hCard);
-                }
-            }
-
             const container = document.getElementById('cardsList');
             container.innerHTML = '';
-
             cardsWithVotes.forEach(card => {
                 const cardDiv = document.createElement('div');
                 cardDiv.className = `card card-${card.card_type || 'otázka'}`;
                 const hlasSlovo = getDeclension(card.totalVotes, ['HLAS', 'HLASY', 'HLASŮ']);
-                
                 cardDiv.innerHTML = `
-                    <button class="report-btn" style="position:absolute; top:12px; left:15px; background:none; border:none; cursor:pointer; opacity:0.3;" onclick="alert('Díky! Pokud je to fakt přes čáru, tak to smažeme.')">🚩</button>
                     <div class="vote-count">${card.totalVotes} ${hlasSlovo}</div>
                     <h3>${card.title}</h3>
                     <div class="card-footer">
@@ -282,7 +289,6 @@
                             }
                             <button class="btn-share" onclick="shareCard('${card.id}', '${card.title.replace(/'/g, "\\'")}')">🔗</button>
                         </div>
-                        <span class="brand-subtext">DICKOBRAZ: KARTY BEZ CENZURY</span>
                     </div>
                 `;
                 container.appendChild(cardDiv);
@@ -291,85 +297,43 @@
 
         async function handleVote(cardId) {
             const email = localStorage.getItem('userEmail');
-            if (!email) { 
-                alert("Nejdřív nám řekni, kdo jsi!"); 
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                return; 
-            }
-
+            if (!email) { alert("Nejdřív nám řekni, kdo jsi!"); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
             const { data: userVotes } = await _supabase.from('votes').select('id').eq('user_email', email);
-            if (userVotes && userVotes.length >= 5) {
-                alert("Máš vybráno! Všech tvých 5 hlasů už je v osudí.");
-                return;
-            }
-
+            if (userVotes && userVotes.length >= 5) { alert("Máš vybráno! Všech tvých 5 hlasů už je v osudí."); return; }
             const btn = document.getElementById(`vote-btn-${cardId}`);
-            btn.disabled = true; btn.innerText = "SČÍTÁM...";
-
-            const { error } = await _supabase.from('votes').insert([{
-                card_id: cardId, user_email: email, user_name: localStorage.getItem('userName'), marketing_consent: true
-            }]);
-
-            if (error) {
-                alert(error.code === '23505' ? 'Dvakrát pro stejnou kartu? Hezký pokus.' : 'Chyba: ' + error.message);
-                btn.disabled = false; btn.innerText = "HLASOVAT";
-            } else fetchCards();
+            btn.disabled = true;
+            const { error } = await _supabase.from('votes').insert([{ card_id: cardId, user_email: email, user_name: localStorage.getItem('userName'), marketing_consent: true }]);
+            if (error) { alert(error.code === '23505' ? 'Dvakrát pro stejnou kartu? Hezký pokus.' : 'Chyba: ' + error.message); btn.disabled = false; } else fetchCards();
         }
 
         async function suggestCard() {
             if (document.getElementById('hp_title').value) return;
-            if (Date.now() - pageLoadTime < 3000) { alert("Sypeš to tam moc rychle, nejsi robot?"); return; }
-
             const email = localStorage.getItem('userEmail');
             const title = document.getElementById('newTitle').value.trim();
             if (title.length < 5) { alert("Zkus napsat víc než dvě slova."); return; }
-            
             const btn = document.getElementById('submitSuggestionBtn');
-            btn.disabled = true; btn.innerText = "KONTROLUJU...";
-
+            btn.disabled = true;
             const { data: existingCards } = await _supabase.from('cards').select('id').eq('user_email', email);
-            if (existingCards && existingCards.length >= 3) {
-                alert("Limit vyčerpán. Tvoje kvóta pro návrhy je u konce.");
-                btn.innerText = "LIMIT VYČERPÁN";
-                return;
-            }
-
-            const { error } = await _supabase.from('cards').insert([{
-                title: title, card_type: document.getElementById('newType').value, is_official: false, user_email: email
-            }]);
-
-            if (!error) {
-                localStorage.setItem('suggestionsCount', (existingCards.length + 1).toString());
-                document.getElementById('newTitle').value = '';
-                updateCharCount(document.getElementById('newTitle'));
-                updateSuggestionCountDisplay();
-                fetchCards();
-                showToast("Návrh odeslán! 😈");
-            }
-            btn.disabled = false; btn.innerText = "ODESLAT NÁVRH";
+            if (existingCards && existingCards.length >= 3) { alert("Limit vyčerpán."); btn.innerText = "LIMIT VYČERPÁN"; return; }
+            const { error } = await _supabase.from('cards').insert([{ title: title, card_type: document.getElementById('newType').value, is_official: false, user_email: email }]);
+            if (!error) { localStorage.setItem('suggestionsCount', (existingCards.length + 1).toString()); document.getElementById('newTitle').value = ''; updateSuggestionCountDisplay(); fetchCards(); showToast("Návrh odeslán! 😈"); }
+            btn.disabled = false;
         }
 
         function saveUser() {
             const spamAnswer = document.getElementById('spamAnswerInput').value.trim();
-            if (spamAnswer !== currentSpamChallenge.a) {
-                alert("Matika ti ve škole moc nešla, co? Zkus tu kontrolní otázku znovu.");
-                initSpamTest();
-                document.getElementById('spamAnswerInput').value = "";
-                return;
-            }
-
+            if (spamAnswer !== currentSpamChallenge.a) { alert("Matika ti ve škole moc nešla, co? Zkus to znovu."); initSpamTest(); return; }
             if (document.getElementById('hp_name').value) return;
-            if (Date.now() - pageLoadTime < 2000) { alert("To bylo až podezřele rychlé..."); return; }
-
             const email = document.getElementById('userEmail').value;
+            const name = document.getElementById('userName').value || 'pařmene';
             const consent = document.getElementById('marketingConsent').checked;
             if (!email || !email.includes('@')) { alert("Zadej platný e-mail."); return; }
-            if (!consent) { alert("Musíš souhlasit s pravidly soutěže."); return; }
-            
+            if (!consent) { alert("Musíš souhlasit s pravidly."); return; }
             localStorage.setItem('userEmail', email);
-            localStorage.setItem('userName', document.getElementById('userName').value || 'pařmene');
-            checkUser();
-            fetchCards();
+            localStorage.setItem('userName', name);
+            subscribeToEcomail(email, name);
+            checkUser(); fetchCards();
+            showToast("Mrkni do mailu a potvrď účast! 📧");
         }
 
         function checkUser() {
@@ -386,30 +350,17 @@
             const rem = 3 - count;
             const name = localStorage.getItem('userName');
             const textEl = document.getElementById('suggestionText');
-            if (rem <= 0) {
-                textEl.innerHTML = `Čau <span style="color:var(--yellow)">${name}</span>! Své 3 návrhy jsi už vyčerpal.`;
-                document.getElementById('submitSuggestionBtn').disabled = true;
-                document.getElementById('submitSuggestionBtn').innerText = 'LIMIT VYČERPÁN';
-            } else {
-                const nSlovo = getDeclension(rem, ['návrh', 'návrhy', 'návrhů']);
-                textEl.innerHTML = `Zdar <span style="color:var(--yellow)">${name}</span>! Zbývá ti ještě <span style="color:var(--yellow)">${rem}</span> ${nSlovo}.`;
-            }
+            if (rem <= 0) { textEl.innerHTML = `Čau <span style="color:var(--yellow)">${name}</span>! Návrhy máš vyčerpané.`; document.getElementById('submitSuggestionBtn').disabled = true; }
+            else { textEl.innerHTML = `Zdar <span style="color:var(--yellow)">${name}</span>! Zbývá ti ještě <span style="color:var(--yellow)">${rem}</span> ${getDeclension(rem, ['návrh', 'návrhy', 'návrhů'])}.`; }
         }
 
         function shareCard(id, title) {
             const url = `${window.location.origin}${window.location.pathname}?cardId=${id}`;
-            navigator.clipboard.writeText(url);
-            showToast("Odkaz zkopírován! 🚀");
+            navigator.clipboard.writeText(url); showToast("Odkaz zkopírován! 🚀");
         }
 
-        window.onload = () => { 
-            checkUser(); 
-            fetchCards();
-            initSpamTest();
-        };
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('rulesModal')) document.getElementById('rulesModal').style.display = "none";
-        }
+        window.onload = () => { checkUser(); fetchCards(); initSpamTest(); };
+        window.onclick = function(event) { if (event.target == document.getElementById('rulesModal')) document.getElementById('rulesModal').style.display = "none"; }
     </script>
 </body>
 </html>
