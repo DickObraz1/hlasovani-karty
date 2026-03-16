@@ -33,11 +33,13 @@
 
         /* MODAL STYLE */
         .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); overflow-y: auto; }
-        .modal-content { background: #1a1a1a; margin: 5% auto; padding: 30px; border: 2px solid var(--yellow); border-radius: 15px; max-width: 600px; color: #fff; line-height: 1.6; position: relative; }
+        .modal-content { background: #1a1a1a; margin: 5% auto; padding: 30px; border: 2px solid var(--yellow); border-radius: 15px; max-width: 650px; color: #fff; line-height: 1.6; position: relative; }
         .close-modal { position: absolute; top: 15px; right: 20px; font-size: 30px; color: var(--yellow); cursor: pointer; font-weight: bold; }
-        .modal h2 { color: var(--yellow); text-transform: uppercase; margin-top: 0; }
-        .modal ul { padding-left: 20px; }
-        .modal li { margin-bottom: 10px; }
+        .modal h2, .modal h3 { color: var(--yellow); text-transform: uppercase; margin-top: 20px; margin-bottom: 10px; }
+        .modal h2:first-of-type { margin-top: 0; }
+        .modal p { margin-bottom: 15px; font-size: 0.95rem; }
+        .modal ul { padding-left: 20px; margin-bottom: 20px; }
+        .modal li { margin-bottom: 8px; font-size: 0.95rem; }
 
         .controls { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; padding-top: 10px; border-top: 1px solid #333; }
         .filter-group button { background: #333; color: white; border: 1px solid var(--yellow); padding: 8px 15px; cursor: pointer; border-radius: 5px; font-weight: bold; }
@@ -72,21 +74,43 @@
     <div id="rulesModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="toggleRules()">&times;</span>
-            <h2>🔥 Spotřebitelská soutěž Dickobraz</h2>
+            <h2>Vymysli kartu. Prohlasuj ji. Možná vyhraješ.</h2>
+            <p>DickObraz spouští soutěž o nové Karty bez cenzury — a tentokrát do toho můžeš kecat i ty.</p>
+
+            <h3>Jak to funguje?</h3>
             <ul>
-                <li><strong>Účast:</strong> Soutěže se může zůčastnit každý jednou pod svým unikátním e-mailem. Musí ti být 18+.</li>
-                <li><strong>Hlasování:</strong> Máš celkem <strong>5 hlasů</strong>. Můžeš je dát pěti různým kartám.</li>
-                <li><strong>Návrhy:</strong> Můžeš poslat až 3 vlastní návrhy karet. Odesláním návrhu nám dáváš souhlas k jeho bezplatnému užití.</li>
-                <li><strong>Výhry:</strong>
-                    <ul>
-                        <li>🥇 <strong>3x Hlavní cena:</strong> Základní balíček + Rozšíření Mezi nohama + NOVÉ rozšíření.</li>
-                        <li>🥈 <strong>2x Druhá cena:</strong> Základní balíček + NOVÉ rozšíření.</li>
-                        <li>🥉 <strong>10x Třetí cena:</strong> NOVÉ rozšíření.</li>
-                    </ul>
-                </li>
-                <li><strong>Odměna pro každého:</strong> Každý, kdo vloží aspoň jeden platný návrh karty, získá <strong>30% slevu na předobjednávku</strong> nové edice.</li>
-                <li><strong>Výběr:</strong> Vítěze vybere odborná porota Dickobraza na základě popularity a vtipnosti.</li>
+                <li>Zapojit se může každý 18+</li>
+                <li>Každý má 5 hlasů</li>
+                <li>Každý hlas můžeš dát jiné kartě</li>
+                <li>Poslat můžeš až 3 vlastní návrhy</li>
+                <li>Každý se může zapojit jen jednou</li>
             </ul>
+
+            <h3>Co můžeš vyhrát?</h3>
+            <ul>
+                <li><strong>3× hlavní cena:</strong> Základní balíček + Rozšíření Mezi nohama + nové rozšíření</li>
+                <li><strong>2× druhá cena:</strong> Základní balíček + nové rozšíření</li>
+                <li><strong>10× třetí cena:</strong> Nové rozšíření</li>
+            </ul>
+            <p>Jeden člověk může vyhrát maximálně jednu výhru.</p>
+
+            <h3>Bonus za vlastní nápad</h3>
+            <p>Pošli aspoň 1 platný návrh karty a dostaneš 30% slevu na předprodej Karet bez cenzury.</p>
+            <p>Sleva ti přijde na mail 15. 8. 2026, nejde kombinovat s dalšími akcemi a platí jen po dobu předprodeje.</p>
+
+            <h3>Důležitá věc, ať pak není brekot</h3>
+            <p>Hlasy od lidí bereme jako doporučení komunity. Finální výběr vítězných návrhů dělá DickObraz podle hlasů, originality, vtipnosti a toho, jestli ta karta fakt stojí za to.</p>
+            <p>Když někdo bude šmelit s hlasováním, fake maily nebo dělat jiný opičárny, můžeme ho bez milosti vyhodit.</p>
+
+            <h3>Kdy to běží?</h3>
+            <p>Soutěž běží od 1. 4. 2026 do 31. 5. 2026. Výherce oznámíme během července 2026.</p>
+
+            <h3>Co se stane s tvým návrhem?</h3>
+            <p>Když nám pošleš návrh, dáváš nám souhlas ho použít, upravit a klidně z něj udělat reálnou kartu do hry.</p>
+
+            <h3>A klasika na závěr</h3>
+            <p>Pořadatel si vyhrazuje právo soutěž změnit, přerušit nebo zrušit. Zapojením do soutěže souhlasíš s pravidly a se zpracováním osobních údajů pro účely soutěže.</p>
+            <p>Pokud si právník a chceš si přečíst full pravidla, tak <a href="https://www.dickobraz.cz/a/pravidla-spotrebitelske-souteze" target="_blank">zde</a>.</p>
         </div>
     </div>
 
@@ -157,7 +181,6 @@
         let currentFilter = 'vše';
         let pageLoadTime = Date.now();
         
-        // KONFIGURACE SPAM TESTU
         const spamQuestions = [
             { q: "Kolik máš rukou, pokud jsi zrovna neutekl z pily?", a: "2" },
             { q: "Kolik má průměrný muž koulí, pokud mu je stará zrovna neuřízla?", a: "2" },
@@ -327,11 +350,10 @@
         }
 
         function saveUser() {
-            // SPAM TEST VALIDACE
             const spamAnswer = document.getElementById('spamAnswerInput').value.trim();
             if (spamAnswer !== currentSpamChallenge.a) {
                 alert("Matika ti ve škole moc nešla, co? Zkus tu kontrolní otázku znovu.");
-                initSpamTest(); // Obměníme otázku
+                initSpamTest();
                 document.getElementById('spamAnswerInput').value = "";
                 return;
             }
@@ -383,7 +405,7 @@
         window.onload = () => { 
             checkUser(); 
             fetchCards();
-            initSpamTest(); // Načte náhodnou otázku při startu
+            initSpamTest();
         };
         window.onclick = function(event) {
             if (event.target == document.getElementById('rulesModal')) document.getElementById('rulesModal').style.display = "none";
