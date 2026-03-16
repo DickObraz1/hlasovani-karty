@@ -168,31 +168,28 @@ async function subscribeToEcomail(email, name) {
     try {
         const response = await fetch(`https://api2.ecomailapp.cz/lists/${LIST_ID}/subscribe`, {
             method: 'POST',
-            // mode: 'no-cors' - tohle smažeme, u 422 to nepotřebujeme
             headers: { 
                 'Content-Type': 'application/json', 
                 'key': API_KEY 
             },
             body: JSON.stringify({
-                "contact": { 
-                    "email": email,
-                    "name": name,
-                    "surname": " " // Přidáme mezeru jako příjmení, kdyby bylo povinné
-                },
-                "trigger_autoresponders": true,
+                "contact": { "email": email, "name": name },
+                "trigger_autoresponders": false, // Vypneme automatizace (aby nečekal na DOI)
                 "update_existing": true,
                 "resubscribe": true
             })
         });
         
-        if (response.status === 422) {
-            console.log("Ecomail: Tenhle mail už tam asi je, nebo chybí povinné pole.");
+        const result = await response.json();
+        console.log("Odpověď od Ecomailu:", result); // Tady v konzoli uvidíme pravdu
+        
+        if (response.ok) {
+            console.log("PECKA! Kontakt by měl být v Ecomailu.");
         }
     } catch (err) { 
-        console.error('Ecomail Error:', err); 
+        console.error('Chyba spojení (asi ten CORS):', err); 
     }
 }
-
         // --- SPAM TEST ---
         const spamQuestions = [
             { q: "Kolik máš rukou, pokud jsi zrovna neutekl z pily?", a: "2" },
