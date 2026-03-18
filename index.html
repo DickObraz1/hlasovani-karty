@@ -161,30 +161,36 @@
         let currentFilter = 'vše';
         let pageLoadTime = Date.now();
 
-        // --- ECOMAIL INTEGRATION ---
-async function subscribeToEcomail(email, name) {
-    const cleanEmail = email.trim().toLowerCase();
+        // --- ECOMAIL INTEGRATION (Ninja verze) ---
+        async function subscribeToEcomail(email, name) {
+            const cleanEmail = email.trim().toLowerCase();
 
-    try {
-        // Tady voláme tvou Supabase tabulku, ne Ecomail
-        const { error } = await _supabase
-            .from('contestants')
-            .insert([{ email: cleanEmail, name: name }]);
+            try {
+                // 1. Uložíme do Supabase jako zálohu
+                const { error } = await _supabase
+                    .from('contestants')
+                    .insert([{ email: cleanEmail, name: name }]);
 
-        if (error) {
-            if (error.code === '23505') {
-                console.log("Ten prďola už v databázi je, to neva.");
-            } else {
-                console.error("Chyba při ukládání kontaktu:", error.message);
+                if (error) {
+                    if (error.code === '23505') {
+                        console.log("Ten prďola už v databázi je.");
+                    } else {
+                        console.error("Supabase Error:", error.message);
+                    }
+                }
+
+                // 2. Tady je ten trik: Odpálíme neviditelný formulář přímo do Ecomailu
+                document.getElementById('hiddenEmail').value = cleanEmail;
+                document.getElementById('hiddenName').value = name;
+                document.getElementById('hiddenEcomailForm').submit();
+
+                console.log("Data odeslána na oba fronty!");
+
+            } catch (err) {
+                console.error('Chyba odesílání:', err);
             }
-        } else {
-            console.log("Kontakt úspěšně uložen do Supabase!");
-            showToast("Mrkni do mailu a potvrď účast! 📧");
         }
-    } catch (err) {
-        console.error('Kritická chyba:', err);
-    }
-}
+
         // --- SPAM TEST ---
         const spamQuestions = [
             { q: "Kolik máš rukou, pokud jsi zrovna neutekl z pily?", a: "2" },
@@ -298,7 +304,7 @@ async function subscribeToEcomail(email, name) {
             localStorage.setItem('userName', name);
             subscribeToEcomail(email, name);
             checkUser(); fetchCards();
-            showToast("Mrkni do mailu a potvrď účast! 📧");
+            showToast("Jsi ve hře! Mrkni do mailu. 📧");
         }
 
         function checkUser() {
@@ -326,11 +332,14 @@ async function subscribeToEcomail(email, name) {
 
         window.onload = () => { checkUser(); fetchCards(); initSpamTest(); };
         window.onclick = function(event) { if (event.target == document.getElementById('rulesModal')) document.getElementById('rulesModal').style.display = "none"; }
-  <form id="hiddenEcomailForm" action="https://dickobraz.ecomailapp.cz/public/subscribe/19/4abfdf42e682f87cd40907d9a0cd4e16" method="post" target="hidden_iframe" style="display:none;">
-    <input type="email" name="email" id="hiddenEmail">
-    <input type="text" name="name" id="hiddenName">
-</form>
-<iframe name="hidden_iframe" style="display:none;"></iframe>
+
     </script>
+
+    <form id="hiddenEcomailForm" action="https://dickobraz.ecomailapp.cz/public/subscribe/19/4abfdf42e682f87cd40907d9a0cd4e16" method="post" target="hidden_iframe" style="display:none;">
+        <input type="email" name="email" id="hiddenEmail">
+        <input type="text" name="name" id="hiddenName">
+    </form>
+    <iframe name="hidden_iframe" style="display:none;"></iframe>
+
 </body>
 </html>
