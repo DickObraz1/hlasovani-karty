@@ -27,28 +27,10 @@
         .promo-box { background: var(--yellow); color: var(--black); padding: 20px; border-radius: 15px; margin-bottom: 25px; text-align: center; border: 3px solid var(--white); }
         .promo-box h4 { margin: 0 0 10px 0; font-size: 1.2rem; text-transform: uppercase; }
         .promo-box p { margin: 0; font-weight: bold; font-size: 0.95rem; line-height: 1.4; }
-        .share-contest-box {
-    background: var(--yellow);
-    color: var(--black);
-    padding: 15px;
-    border-radius: 12px;
-    margin: 20px 0;
-    text-align: center;
-    border: 3px solid var(--white);
-}
-.share-contest-box h4 { margin: 0 0 10px 0; text-transform: uppercase; font-size: 1.1rem; }
-.btn-share-main {
-    background: var(--black);
-    color: var(--white);
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    text-transform: uppercase;
-    font-size: 0.9rem;
-    margin-top: 10px;
-}
+
+        .share-contest-box { background: var(--yellow); color: var(--black); padding: 15px; border-radius: 12px; margin: 20px 0; text-align: center; border: 3px solid var(--white); }
+        .share-contest-box h4 { margin: 0 0 10px 0; text-transform: uppercase; font-size: 1.1rem; }
+        .btn-share-main { background: var(--black); color: var(--white); border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; margin-top: 10px; }
 
         .rules-link { display: block; text-align: center; margin-bottom: 20px; color: #888; text-decoration: underline; cursor: pointer; font-size: 0.9rem; }
 
@@ -84,7 +66,7 @@
         #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--yellow); color: var(--black); padding: 10px 20px; border-radius: 20px; font-weight: bold; z-index: 1000; display: none; }
         a { color: var(--yellow); }
 
-        /* HAMBURGER MENU STYLY */
+        /* HAMBURGER MENU */
         .hamburger { position: fixed; top: 20px; right: 20px; z-index: 1100; cursor: pointer; background: var(--yellow); padding: 10px; border-radius: 8px; display: flex; flex-direction: column; gap: 5px; border: 2px solid var(--black); }
         .hamburger div { width: 25px; height: 3px; background: var(--black); transition: 0.3s; }
         .side-menu { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: var(--yellow); z-index: 1200; transition: 0.3s; padding: 60px 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; }
@@ -150,18 +132,14 @@
         </div>
 
         <div id="welcomeBack" class="user-welcome hidden" style="text-align:center;">
-    <p id="suggestionText"></p>
-    <p id="votesLeftText" style="font-size: 0.9rem; opacity: 0.8;"></p>
-    
-    <div class="share-contest-box">
-        <h4>📢 Chceš větší šanci na výhru?</h4>
-        <p>Sdílej soutěž s kámošema! Čím víc lidí tvoje návrhy uvidí, tím víc hlasů můžeš posbírat.</p>
-        <button class="btn-share-main" onclick="shareMainSite()">🚀 SDÍLET SOUTĚŽ</button>
-    </div>
-</div>
-            
             <p id="suggestionText"></p>
             <p id="votesLeftText" style="font-size: 0.9rem; opacity: 0.8;"></p>
+            
+            <div class="share-contest-box">
+                <h4>📢 Chceš větší šanci na výhru?</h4>
+                <p>Sdílej soutěž s kámošema! Čím víc lidí tvoje návrhy uvidí, tím víc hlasů můžeš posbírat.</p>
+                <button class="btn-share-main" onclick="shareMainSite()">🚀 SDÍLET SOUTĚŽ</button>
+            </div>
         </div>
 
         <div id="suggestionForm" class="add-suggestion hidden">
@@ -237,33 +215,23 @@
             return div.innerHTML;
         }
 
-        // --- MENU LOGIKA ---
         function toggleMenu() {
             document.getElementById('sideMenu').classList.toggle('active');
             document.getElementById('menuOverlay').classList.toggle('active');
         }
 
-        // --- ECOMAIL INTEGRATION (Ninja verze) ---
         async function subscribeToEcomail(email, name) {
             const cleanEmail = email.trim().toLowerCase();
             try {
-                const { error } = await _supabase
-                    .from('contestants')
-                    .insert([{ email: cleanEmail, name: name }]);
-
-                if (error) {
-                    if (error.code !== '23505') console.error("Supabase Error:", error.message);
-                }
+                const { error } = await _supabase.from('contestants').insert([{ email: cleanEmail, name: name }]);
+                if (error && error.code !== '23505') console.error("Supabase Error:", error.message);
+                
                 document.getElementById('hiddenEmail').value = cleanEmail;
                 document.getElementById('hiddenName').value = name;
                 document.getElementById('hiddenEcomailForm').submit();
-                console.log("Data odeslána na oba fronty!");
-            } catch (err) {
-                console.error('Chyba odesílání:', err);
-            }
+            } catch (err) { console.error('Chyba odesílání:', err); }
         }
 
-        // --- SPAM TEST ---
         const spamQuestions = [
             { q: "Kolik máš rukou, pokud jsi zrovna neutekl z pily?", a: "2" },
             { q: "Kolik má průměrný muž koulí, pokud mu je stará zrovna neuřízla?", a: "2" },
@@ -386,20 +354,6 @@
                 document.getElementById('suggestionForm').classList.remove('hidden');
                 updateSuggestionCountDisplay();
             }
-            function shareMainSite() {
-    const shareData = {
-        title: 'DickObraz - Soutěž o novou edici',
-        text: 'Vymyslel jsem kartu do DickObrazu! Pojď pro ni hlasovat nebo navrhni vlastní a vyhraj hru zdarma.',
-        url: window.location.origin
-    };
-
-    if (navigator.share) {
-        navigator.share(shareData);
-    } else {
-        navigator.clipboard.writeText(window.location.origin);
-        showToast("Odkaz na soutěž zkopírován! 🚀");
-    }
-}
         }
 
         function updateSuggestionCountDisplay() {
@@ -409,6 +363,16 @@
             const textEl = document.getElementById('suggestionText');
             if (rem <= 0) { textEl.innerHTML = `Čau <span style="color:var(--yellow)">${name}</span>! Návrhy máš vyčerpané.`; document.getElementById('submitSuggestionBtn').disabled = true; }
             else { textEl.innerHTML = `Zdar <span style="color:var(--yellow)">${name}</span>! Zbývá ti ještě <span style="color:var(--yellow)">${rem}</span> ${getDeclension(rem, ['návrh', 'návrhy', 'návrhů'])}.`; }
+        }
+
+        function shareMainSite() {
+            const shareData = {
+                title: 'DickObraz - Soutěž o novou edici',
+                text: 'Vymyslel jsem kartu do DickObrazu! Pojď pro ni hlasovat nebo navrhni vlastní a vyhraj hru zdarma.',
+                url: window.location.origin
+            };
+            if (navigator.share) { navigator.share(shareData); } 
+            else { navigator.clipboard.writeText(window.location.origin); showToast("Odkaz na soutěž zkopírován! 🚀"); }
         }
 
         function shareCard(id, title) {
