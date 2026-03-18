@@ -150,6 +150,16 @@
         </div>
 
         <div id="welcomeBack" class="user-welcome hidden" style="text-align:center;">
+    <p id="suggestionText"></p>
+    <p id="votesLeftText" style="font-size: 0.9rem; opacity: 0.8;"></p>
+    
+    <div class="share-contest-box">
+        <h4>📢 Chceš větší šanci na výhru?</h4>
+        <p>Sdílej soutěž s kámošema! Čím víc lidí tvoje návrhy uvidí, tím víc hlasů můžeš posbírat.</p>
+        <button class="btn-share-main" onclick="shareMainSite()">🚀 SDÍLET SOUTĚŽ</button>
+    </div>
+</div>
+            
             <p id="suggestionText"></p>
             <p id="votesLeftText" style="font-size: 0.9rem; opacity: 0.8;"></p>
         </div>
@@ -376,6 +386,20 @@
                 document.getElementById('suggestionForm').classList.remove('hidden');
                 updateSuggestionCountDisplay();
             }
+            function shareMainSite() {
+    const shareData = {
+        title: 'DickObraz - Soutěž o novou edici',
+        text: 'Vymyslel jsem kartu do DickObrazu! Pojď pro ni hlasovat nebo navrhni vlastní a vyhraj hru zdarma.',
+        url: window.location.origin
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData);
+    } else {
+        navigator.clipboard.writeText(window.location.origin);
+        showToast("Odkaz na soutěž zkopírován! 🚀");
+    }
+}
         }
 
         function updateSuggestionCountDisplay() {
