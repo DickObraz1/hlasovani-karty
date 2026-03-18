@@ -306,8 +306,8 @@ function sanitize(str) {
                 const hlasSlovo = getDeclension(card.totalVotes, ['HLAS', 'HLASY', 'HLASŮ']);
                 cardDiv.innerHTML = `
                     <div class="vote-count">${card.totalVotes} ${hlasSlovo}</div>
-                    <h3>${card.title}</h3>
-                    <div class="card-footer">
+<h3>${sanitize(card.title)}</h3>
+<div class="card-footer">
                         <div class="btn-group">
                             ${card.hasVoted 
                                 ? '<button class="btn-vote btn-voted" disabled>✅ HLASOVÁNO</button>' 
