@@ -326,6 +326,11 @@ async function subscribeToEcomail(email, name) {
 
         window.onload = () => { checkUser(); fetchCards(); initSpamTest(); };
         window.onclick = function(event) { if (event.target == document.getElementById('rulesModal')) document.getElementById('rulesModal').style.display = "none"; }
+  <form id="hiddenEcomailForm" action="https://dickobraz.ecomailapp.cz/public/subscribe/19/4abfdf42e682f87cd40907d9a0cd4e16" method="post" target="hidden_iframe" style="display:none;">
+    <input type="email" name="email" id="hiddenEmail">
+    <input type="text" name="name" id="hiddenName">
+</form>
+<iframe name="hidden_iframe" style="display:none;"></iframe>
     </script>
 </body>
 </html>
