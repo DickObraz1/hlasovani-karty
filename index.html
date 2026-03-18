@@ -377,7 +377,18 @@
 
         function shareCard(id, title) {
             const url = `${window.location.origin}${window.location.pathname}?cardId=${id}`;
-            navigator.clipboard.writeText(url); showToast("Odkaz zkopírován! 🚀");
+            const shareData = {
+                title: 'Hlasuj pro moji kartu v DickObrazu!',
+                text: `Koukni na tenhle návrh: "${title}". Dej mu hlas, ať ho reálně vydají!`,
+                url: url
+            };
+
+            if (navigator.share) {
+                navigator.share(shareData).catch(err => console.log('Sdílení zrušeno'));
+            } else {
+                navigator.clipboard.writeText(url);
+                showToast("Odkaz na kartu zkopírován! 🚀");
+            }
         }
 
         window.onload = () => { checkUser(); fetchCards(); initSpamTest(); };
