@@ -196,7 +196,7 @@
             <p>Jeden člověk může vyhrát maximálně jednu výhru.</p>
             <h3>Bonus za vlastní nápad</h3>
             <p>Pošli aspoň 1 platný návrh karty a dostaneš 30% slevu na předprodej Karet bez cenzury.</p>
-            <p>Sleva ti přijde na email do 15. 8. 2026, nejde kombinovat s dalšími akcemi a platí jen po dobu předprodeje.</p>
+            <p>Sleva ti přijde na mail 15. 8. 2026, nejde kombinovat s dalšími akcemi a platí jen po dobu předprodeje.</p>
             <h3>Důležitá věc, ať pak není brekot</h3>
             <p>Hlasy od lidí bereme jako doporučení komunity. Finální výběr vítězných návrhů dělá DickObraz podle hlasů, originality, vtipnosti a toho, jestli ta karta fakt stojí za to.</p>
             <p>Soutěž běží od 1. 4. 2026 do 31. 5. 2026. Výherce oznámíme během července 2026.</p>
@@ -224,12 +224,20 @@
             const cleanEmail = email.trim().toLowerCase();
             try {
                 const { error } = await _supabase.from('contestants').insert([{ email: cleanEmail, name: name }]);
-                if (error && error.code !== '23505') console.error("Supabase Error:", error.message);
                 
+                // Pokud uživatel už v DB je (error 23505), je to v pohodě, jen ho "přihlásíme"
+                if (error && error.code !== '23505') {
+                    console.error("Supabase Error:", error.message);
+                }
+                
+                // I pro existujícího uživatele pošleme formulář do Ecomailu (pro jistotu update)
                 document.getElementById('hiddenEmail').value = cleanEmail;
                 document.getElementById('hiddenName').value = name;
                 document.getElementById('hiddenEcomailForm').submit();
-            } catch (err) { console.error('Chyba odesílání:', err); }
+
+            } catch (err) { 
+                console.error('Chyba odesílání:', err); 
+            }
         }
 
         const spamQuestions = [
@@ -244,7 +252,7 @@
         function initSpamTest() {
             currentSpamChallenge = spamQuestions[Math.floor(Math.random() * spamQuestions.length)];
             const label = document.getElementById('spamQuestionLabel');
-            if(label) label.innerText = currentSpamChallenge.q;
+            if (label) label.innerText = currentSpamChallenge.q;
         }
 
         function toggleRules() {
@@ -315,7 +323,17 @@
             const btn = document.getElementById(`vote-btn-${cardId}`);
             btn.disabled = true;
             const { error } = await _supabase.from('votes').insert([{ card_id: cardId, user_email: email, user_name: localStorage.getItem('userName'), marketing_consent: true }]);
-            if (error) { alert(error.code === '23505' ? 'Dvakrát pro stejnou kartu? Hezký pokus.' : 'Chyba: ' + error.message); btn.disabled = false; } else fetchCards();
+            
+            if (error) { 
+                if (error.code === '23505') {
+                    alert('Dvakrát pro stejnou kartu? Hezký pokus.');
+                } else {
+                    alert('Chyba: ' + error.message); 
+                }
+                btn.disabled = false; 
+            } else {
+                fetchCards();
+            }
         }
 
         async function suggestCard() {
@@ -325,27 +343,45 @@
             if (title.length < 5) { alert("Zkus napsat víc než dvě slova."); return; }
             const btn = document.getElementById('submitSuggestionBtn');
             btn.disabled = true;
-            const { data: existingCards } = await _supabase.from('cards').select('id').eq('user_email', email);
-            if (existingCards && existingCards.length >= 3) { alert("Limit vyčerpán."); btn.innerText = "LIMIT VYČERPÁN"; return; }
+            
             const { error } = await _supabase.from('cards').insert([{ title: title, card_type: document.getElementById('newType').value, is_official: false, user_email: email }]);
-            if (!error) { localStorage.setItem('suggestionsCount', (existingCards.length + 1).toString()); document.getElementById('newTitle').value = ''; updateSuggestionCountDisplay(); fetchCards(); showToast("Návrh odeslán! 😈"); }
-            btn.disabled = false;
+            
+            if (error) {
+                if (error.code === '23505') {
+                    showToast("Tenhle nápad už v osudí je! Zkus něco originálnějšího. 😉");
+                } else {
+                    alert('Chyba: ' + error.message);
+                }
+                btn.disabled = false;
+            } else {
+                const { data: existingCards } = await _supabase.from('cards').select('id').eq('user_email', email);
+                localStorage.setItem('suggestionsCount', (existingCards ? existingCards.length : 0).toString());
+                document.getElementById('newTitle').value = '';
+                updateSuggestionCountDisplay();
+                fetchCards();
+                showToast("Návrh odeslán! 😈");
+                btn.disabled = false;
+            }
         }
 
         function saveUser() {
             const spamAnswer = document.getElementById('spamAnswerInput').value.trim();
             if (spamAnswer !== currentSpamChallenge.a) { alert("Matika ti ve škole moc nešla, co? Zkus to znovu."); initSpamTest(); return; }
             if (document.getElementById('hp_name').value) return;
-            const email = document.getElementById('userEmail').value;
-            const name = document.getElementById('userName').value || 'pařmene';
+            const email = document.getElementById('userEmail').value.trim();
+            const name = document.getElementById('userName').value.trim() || 'pařmene';
             const consent = document.getElementById('marketingConsent').checked;
+            
             if (!email || !email.includes('@')) { alert("Zadej platný e-mail."); return; }
             if (!consent) { alert("Musíš souhlasit s pravidly."); return; }
+            
             localStorage.setItem('userEmail', email);
             localStorage.setItem('userName', name);
+            
             subscribeToEcomail(email, name);
-            checkUser(); fetchCards();
-            showToast("Jsi ve hře! Mrkni do mailu. 📧");
+            checkUser(); 
+            fetchCards();
+            showToast("Jsi ve hře! 📧");
         }
 
         function checkUser() {
@@ -357,14 +393,27 @@
             }
         }
 
-        function updateSuggestionCountDisplay() {
-            const count = parseInt(localStorage.getItem('suggestionsCount') || '0');
+        async function updateSuggestionCountDisplay() {
+            const email = localStorage.getItem('userEmail');
+            if (!email) return;
+
+            const { data: cards } = await _supabase.from('cards').select('id').eq('user_email', email);
+            const count = cards ? cards.length : 0;
             const rem = 3 - count;
             const name = localStorage.getItem('userName');
             const textEl = document.getElementById('suggestionText');
+            
             if (textEl) {
-                if (rem <= 0) { textEl.innerHTML = `Čau <span style="color:var(--yellow)">${name}</span>! Návrhy máš vyčerpané.`; document.getElementById('submitSuggestionBtn').disabled = true; }
-                else { textEl.innerHTML = `Zdar <span style="color:var(--yellow)">${name}</span>! Zbývá ti ještě <span style="color:var(--yellow)">${rem}</span> ${getDeclension(rem, ['návrh', 'návrhy', 'návrhů'])}.`; }
+                if (rem <= 0) { 
+                    textEl.innerHTML = `Čau <span style="color:var(--yellow)">${name}</span>! Návrhy máš vyčerpané.`; 
+                    document.getElementById('submitSuggestionBtn').disabled = true; 
+                    document.getElementById('submitSuggestionBtn').innerText = "LIMIT VYČERPÁN";
+                }
+                else { 
+                    textEl.innerHTML = `Zdar <span style="color:var(--yellow)">${name}</span>! Zbývá ti ještě <span style="color:var(--yellow)">${rem}</span> ${getDeclension(rem, ['návrh', 'návrhy', 'návrhů'])}.`; 
+                    document.getElementById('submitSuggestionBtn').disabled = false;
+                    document.getElementById('submitSuggestionBtn').innerText = "ODESLAT NÁVRH";
+                }
             }
         }
 
@@ -375,7 +424,7 @@
         function shareMainSite() {
             const shareUrl = window.location.origin + "?utm_source=user_share";
             const shareData = {
-                title: 'Vyhraj novou edici KARTY BEZ CENZURY',
+                title: 'Vyhraj novou edici KARTY BERZ CENZURY',
                 text: 'Vymyslel jsem kartu do DickObrazu! Pojď pro ni hlasovat nebo navrhni vlastní a vyhraj hru zdarma.',
                 url: shareUrl
             };
