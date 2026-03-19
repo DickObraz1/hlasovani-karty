@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hlasování o nových kartách | Dickobraz</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '2122341875236179');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=2122341875236179&ev=PageView&noscript=1"
+    /></noscript>
     <style>
         :root { --yellow: #fbda18; --black: #000000; --white: #ffffff; --dark-grey: #444; --error: #ff4444; }
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background: var(--black); color: var(--white); -webkit-font-smoothing: antialiased; }
@@ -14,7 +30,6 @@
         .user-info-section { background: #1a1a1a; padding: 25px; border-radius: 15px; border: 2px solid var(--yellow); margin-bottom: 30px; }
         .hidden { display: none !important; }
         
-        /* Anti-spam */
         .hp-field { opacity: 0; position: absolute; top: 0; left: 0; height: 0; width: 0; z-index: -1; }
         .spam-test-box { background: #222; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #333; }
         .spam-test-box label { font-size: 0.9rem; color: var(--yellow); display: block; margin-bottom: 8px; font-weight: bold; }
@@ -34,7 +49,6 @@
 
         .rules-link { display: block; text-align: center; margin-bottom: 20px; color: #888; text-decoration: underline; cursor: pointer; font-size: 0.9rem; }
 
-        /* MODAL STYLE */
         .modal { display: none; position: fixed; z-index: 2001; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); overflow-y: auto; }
         .modal-content { background: #1a1a1a; margin: 5% auto; padding: 30px; border: 2px solid var(--yellow); border-radius: 15px; max-width: 650px; color: #fff; line-height: 1.6; position: relative; }
         .close-modal { position: absolute; top: 15px; right: 20px; font-size: 30px; color: var(--yellow); cursor: pointer; font-weight: bold; }
@@ -64,9 +78,7 @@
         .submit-btn:disabled { background: #555; cursor: not-allowed; }
         .char-counter { text-align: right; margin-top: -10px; margin-bottom: 10px; font-size: 0.75rem; color: #888; font-weight: bold; }
         #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--yellow); color: var(--black); padding: 10px 20px; border-radius: 20px; font-weight: bold; z-index: 1000; display: none; }
-        a { color: var(--yellow); }
 
-        /* HAMBURGER MENU */
         .hamburger { position: fixed; top: 20px; right: 20px; z-index: 1100; cursor: pointer; background: var(--yellow); padding: 10px; border-radius: 8px; display: flex; flex-direction: column; gap: 5px; border: 2px solid var(--black); }
         .hamburger div { width: 25px; height: 3px; background: var(--black); transition: 0.3s; }
         .side-menu { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: var(--yellow); z-index: 1200; transition: 0.3s; padding: 60px 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; }
@@ -103,7 +115,7 @@
 
     <div id="toast"></div>
 
-    <h1>⚡ Podílej se na vzniku nové edice Karet bez cenzury ⚡</h1>
+    <h1>⚡ Spoluvytvářej novou edici KARTY BEZ CENZURY⚡</h1>
 
     <div id="main-content">
         <div id="userInfoSection" class="user-info-section">
@@ -207,7 +219,6 @@
     <script>
         const _supabase = supabase.createClient('https://lixnqbjlozrqceixmbft.supabase.co', 'sb_publishable_vGycWa1bjT2riAUXTT6pNA_xjRvPHeP');
         let currentFilter = 'vše';
-        let pageLoadTime = Date.now();
 
         function sanitize(str) {
             const div = document.createElement('div');
@@ -224,20 +235,16 @@
             const cleanEmail = email.trim().toLowerCase();
             try {
                 const { error } = await _supabase.from('contestants').insert([{ email: cleanEmail, name: name }]);
+                if (error && error.code !== '23505') console.error("Supabase Error:", error.message);
                 
-                // Pokud uživatel už v DB je (error 23505), je to v pohodě, jen ho "přihlásíme"
-                if (error && error.code !== '23505') {
-                    console.error("Supabase Error:", error.message);
-                }
-                
-                // I pro existujícího uživatele pošleme formulář do Ecomailu (pro jistotu update)
                 document.getElementById('hiddenEmail').value = cleanEmail;
                 document.getElementById('hiddenName').value = name;
                 document.getElementById('hiddenEcomailForm').submit();
 
-            } catch (err) { 
-                console.error('Chyba odesílání:', err); 
-            }
+                // FB Událost: Registrace dokončena
+                fbq('track', 'CompleteRegistration');
+
+            } catch (err) { console.error('Chyba odesílání:', err); }
         }
 
         const spamQuestions = [
@@ -325,13 +332,12 @@
             const { error } = await _supabase.from('votes').insert([{ card_id: cardId, user_email: email, user_name: localStorage.getItem('userName'), marketing_consent: true }]);
             
             if (error) { 
-                if (error.code === '23505') {
-                    alert('Dvakrát pro stejnou kartu? Hezký pokus.');
-                } else {
-                    alert('Chyba: ' + error.message); 
-                }
+                if (error.code === '23505') alert('Dvakrát pro stejnou kartu? Hezký pokus.');
+                else alert('Chyba: ' + error.message); 
                 btn.disabled = false; 
             } else {
+                // FB Událost: Hlasování
+                fbq('trackCustom', 'Vote');
                 fetchCards();
             }
         }
@@ -347,13 +353,13 @@
             const { error } = await _supabase.from('cards').insert([{ title: title, card_type: document.getElementById('newType').value, is_official: false, user_email: email }]);
             
             if (error) {
-                if (error.code === '23505') {
-                    showToast("Tenhle nápad už v osudí je! Zkus něco originálnějšího. 😉");
-                } else {
-                    alert('Chyba: ' + error.message);
-                }
+                if (error.code === '23505') showToast("Tenhle nápad už v osudí je! 😉");
+                else alert('Chyba: ' + error.message);
                 btn.disabled = false;
             } else {
+                // FB Událost: Návrh karty (Lead)
+                fbq('track', 'Lead', { content_name: 'CardSuggestion' });
+                
                 const { data: existingCards } = await _supabase.from('cards').select('id').eq('user_email', email);
                 localStorage.setItem('suggestionsCount', (existingCards ? existingCards.length : 0).toString());
                 document.getElementById('newTitle').value = '';
@@ -366,7 +372,7 @@
 
         function saveUser() {
             const spamAnswer = document.getElementById('spamAnswerInput').value.trim();
-            if (spamAnswer !== currentSpamChallenge.a) { alert("Matika ti ve škole moc nešla, co? Zkus to znovu."); initSpamTest(); return; }
+            if (spamAnswer !== currentSpamChallenge.a) { alert("Matika ti ve škole moc nešla, co?"); initSpamTest(); return; }
             if (document.getElementById('hp_name').value) return;
             const email = document.getElementById('userEmail').value.trim();
             const name = document.getElementById('userName').value.trim() || 'pařmene';
@@ -396,20 +402,17 @@
         async function updateSuggestionCountDisplay() {
             const email = localStorage.getItem('userEmail');
             if (!email) return;
-
             const { data: cards } = await _supabase.from('cards').select('id').eq('user_email', email);
             const count = cards ? cards.length : 0;
             const rem = 3 - count;
             const name = localStorage.getItem('userName');
             const textEl = document.getElementById('suggestionText');
-            
             if (textEl) {
                 if (rem <= 0) { 
                     textEl.innerHTML = `Čau <span style="color:var(--yellow)">${name}</span>! Návrhy máš vyčerpané.`; 
                     document.getElementById('submitSuggestionBtn').disabled = true; 
                     document.getElementById('submitSuggestionBtn').innerText = "LIMIT VYČERPÁN";
-                }
-                else { 
+                } else { 
                     textEl.innerHTML = `Zdar <span style="color:var(--yellow)">${name}</span>! Zbývá ti ještě <span style="color:var(--yellow)">${rem}</span> ${getDeclension(rem, ['návrh', 'návrhy', 'návrhů'])}.`; 
                     document.getElementById('submitSuggestionBtn').disabled = false;
                     document.getElementById('submitSuggestionBtn').innerText = "ODESLAT NÁVRH";
@@ -423,37 +426,21 @@
 
         function shareMainSite() {
             const shareUrl = window.location.origin + "?utm_source=user_share";
-            const shareData = {
-                title: 'Vyhraj novou edici KARTY BERZ CENZURY',
-                text: 'Vymyslel jsem kartu do DickObrazu! Pojď pro ni hlasovat nebo navrhni vlastní a vyhraj hru zdarma.',
-                url: shareUrl
-            };
+            const shareData = { title: 'Vyhraj karty DickObraz', text: 'Vymyslel jsem kartu! Pojď pro ni hlasovat.', url: shareUrl };
             logShare('main_site');
             if (navigator.share) { navigator.share(shareData); } 
-            else { navigator.clipboard.writeText(shareUrl); showToast("Odkaz na soutěž zkopírován! 🚀"); }
+            else { navigator.clipboard.writeText(shareUrl); showToast("Odkaz zkopírován! 🚀"); }
         }
 
         function shareCard(id, title) {
             const shareUrl = `${window.location.origin}${window.location.pathname}?cardId=${id}&utm_source=card_share`;
-            const shareData = {
-                title: 'Hlasuj pro moji kartu v DickObrazu!',
-                text: `Koukni na tenhle návrh: "${title}". Dej mu hlas, ať ho reálně vydají!`,
-                url: shareUrl
-            };
+            const shareData = { title: 'Hlasuj pro moji kartu!', text: `Koukni na návrh: "${title}".`, url: shareUrl };
             logShare('card', id);
-            if (navigator.share) {
-                navigator.share(shareData).catch(err => console.log('Sdílení zrušeno'));
-            } else {
-                navigator.clipboard.writeText(shareUrl);
-                showToast("Odkaz na kartu zkopírován! 🚀");
-            }
+            if (navigator.share) { navigator.share(shareData).catch(err => console.log('Zrušeno')); } 
+            else { navigator.clipboard.writeText(shareUrl); showToast("Odkaz zkopírován! 🚀"); }
         }
 
-        window.onload = () => { 
-            checkUser(); 
-            fetchCards(); 
-            initSpamTest(); 
-        };
+        window.onload = () => { checkUser(); fetchCards(); initSpamTest(); };
         window.onclick = function(event) { if (event.target == document.getElementById('rulesModal')) document.getElementById('rulesModal').style.display = "none"; }
     </script>
 
