@@ -243,7 +243,8 @@
 
         function initSpamTest() {
             currentSpamChallenge = spamQuestions[Math.floor(Math.random() * spamQuestions.length)];
-            document.getElementById('spamQuestionLabel').innerText = currentSpamChallenge.q;
+            const label = document.getElementById('spamQuestionLabel');
+            if(label) label.innerText = currentSpamChallenge.q;
         }
 
         function toggleRules() {
@@ -361,11 +362,11 @@
             const rem = 3 - count;
             const name = localStorage.getItem('userName');
             const textEl = document.getElementById('suggestionText');
-            if (rem <= 0) { textEl.innerHTML = `Čau <span style="color:var(--yellow)">${name}</span>! Návrhy máš vyčerpané.`; document.getElementById('submitSuggestionBtn').disabled = true; }
-            else { textEl.innerHTML = `Zdar <span style="color:var(--yellow)">${name}</span>! Zbývá ti ještě <span style="color:var(--yellow)">${rem}</span> ${getDeclension(rem, ['návrh', 'návrhy', 'návrhů'])}.`; }
+            if (textEl) {
+                if (rem <= 0) { textEl.innerHTML = `Čau <span style="color:var(--yellow)">${name}</span>! Návrhy máš vyčerpané.`; document.getElementById('submitSuggestionBtn').disabled = true; }
+                else { textEl.innerHTML = `Zdar <span style="color:var(--yellow)">${name}</span>! Zbývá ti ještě <span style="color:var(--yellow)">${rem}</span> ${getDeclension(rem, ['návrh', 'návrhy', 'návrhů'])}.`; }
+            }
         }
-
-       // --- TADY TO VLOŽÍŠ ---
 
         async function logShare(type, cardId = null) {
             await _supabase.from('share_logs').insert([{ type: type, card_id: cardId }]);
@@ -378,9 +379,7 @@
                 text: 'Vymyslel jsem kartu do DickObrazu! Pojď pro ni hlasovat nebo navrhni vlastní a vyhraj hru zdarma.',
                 url: shareUrl
             };
-            
             logShare('main_site');
-            
             if (navigator.share) { navigator.share(shareData); } 
             else { navigator.clipboard.writeText(shareUrl); showToast("Odkaz na soutěž zkopírován! 🚀"); }
         }
@@ -392,9 +391,7 @@
                 text: `Koukni na tenhle návrh: "${title}". Dej mu hlas, ať ho reálně vydají!`,
                 url: shareUrl
             };
-
             logShare('card', id);
-
             if (navigator.share) {
                 navigator.share(shareData).catch(err => console.log('Sdílení zrušeno'));
             } else {
@@ -403,12 +400,11 @@
             }
         }
 
-        // --- KONEC VLOŽENÉHO BLOKU ---
-
-        window.onload = () => { checkUser(); fetchCards(); initSpamTest(); };
-        }
-
-        window.onload = () => { checkUser(); fetchCards(); initSpamTest(); };
+        window.onload = () => { 
+            checkUser(); 
+            fetchCards(); 
+            initSpamTest(); 
+        };
         window.onclick = function(event) { if (event.target == document.getElementById('rulesModal')) document.getElementById('rulesModal').style.display = "none"; }
     </script>
 
