@@ -365,30 +365,47 @@
             else { textEl.innerHTML = `Zdar <span style="color:var(--yellow)">${name}</span>! Zbývá ti ještě <span style="color:var(--yellow)">${rem}</span> ${getDeclension(rem, ['návrh', 'návrhy', 'návrhů'])}.`; }
         }
 
+       // --- TADY TO VLOŽÍŠ ---
+
+        async function logShare(type, cardId = null) {
+            await _supabase.from('share_logs').insert([{ type: type, card_id: cardId }]);
+        }
+
         function shareMainSite() {
+            const shareUrl = window.location.origin + "?utm_source=user_share";
             const shareData = {
-                title: 'Vyhraj novou edici KARTY BERZ CENZURY',
+                title: 'Vyhraj novou edici KARTY BEZ CENZURY',
                 text: 'Vymyslel jsem kartu do DickObrazu! Pojď pro ni hlasovat nebo navrhni vlastní a vyhraj hru zdarma.',
-                url: window.location.origin
+                url: shareUrl
             };
+            
+            logShare('main_site');
+            
             if (navigator.share) { navigator.share(shareData); } 
-            else { navigator.clipboard.writeText(window.location.origin); showToast("Odkaz na soutěž zkopírován! 🚀"); }
+            else { navigator.clipboard.writeText(shareUrl); showToast("Odkaz na soutěž zkopírován! 🚀"); }
         }
 
         function shareCard(id, title) {
-            const url = `${window.location.origin}${window.location.pathname}?cardId=${id}`;
+            const shareUrl = `${window.location.origin}${window.location.pathname}?cardId=${id}&utm_source=card_share`;
             const shareData = {
                 title: 'Hlasuj pro moji kartu v DickObrazu!',
                 text: `Koukni na tenhle návrh: "${title}". Dej mu hlas, ať ho reálně vydají!`,
-                url: url
+                url: shareUrl
             };
+
+            logShare('card', id);
 
             if (navigator.share) {
                 navigator.share(shareData).catch(err => console.log('Sdílení zrušeno'));
             } else {
-                navigator.clipboard.writeText(url);
+                navigator.clipboard.writeText(shareUrl);
                 showToast("Odkaz na kartu zkopírován! 🚀");
             }
+        }
+
+        // --- KONEC VLOŽENÉHO BLOKU ---
+
+        window.onload = () => { checkUser(); fetchCards(); initSpamTest(); };
         }
 
         window.onload = () => { checkUser(); fetchCards(); initSpamTest(); };
