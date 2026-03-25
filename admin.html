@@ -10,6 +10,9 @@
         .card-row { background: #222; margin-bottom: 10px; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid transparent; }
         .card-row.is-official { border-left-color: #00ff00; }
         .btn-del { background: #ff4444; border: none; color: white; padding: 8px; cursor: pointer; border-radius: 5px; margin-left: 5px; }
+        .btn-hide { background: #ff8800; border: none; color: white; padding: 8px; cursor: pointer; border-radius: 5px; font-weight: bold; }
+        .btn-unhide { background: #555; border: none; color: #fff; padding: 8px; cursor: pointer; border-radius: 5px; }
+        .card-row.is-hidden { opacity: 0.45; border-left-color: #ff4444; }
         .btn-ok { background: #00ff00; border: none; color: black; padding: 8px; cursor: pointer; border-radius: 5px; font-weight: bold; }
         .info { font-size: 0.85rem; color: #aaa; margin-top: 5px; }
         .email-tag { color: #fbda18; font-weight: bold; }
@@ -88,7 +91,7 @@
 
             cards.forEach(card => {
                 const row = document.createElement('div');
-                row.className = `card-row ${card.is_official ? 'is-official' : ''}`;
+                row.className = `card-row ${card.is_official ? 'is-official' : ''} ${card.is_hidden ? 'is-hidden' : ''}`;
 
                 const authorEmail = card.user_email || 'Neznamý autor';
 
@@ -120,17 +123,22 @@
                 actionsDiv.style.display = 'flex';
                 actionsDiv.style.gap = '10px';
 
-                if (!card.is_official) {
-                    const approveBtn = document.createElement('button');
-                    approveBtn.className = 'btn-ok';
-                    approveBtn.textContent = 'SCHVALIT';
-                    approveBtn.onclick = () => approve(card.id);
-                    actionsDiv.appendChild(approveBtn);
+                if (card.is_hidden) {
+                    const hiddenLabel = document.createElement('span');
+                    hiddenLabel.style.cssText = 'color:#ff4444; font-weight:bold; padding:8px; font-size:0.8rem;';
+                    hiddenLabel.textContent = 'SKRYTA';
+                    actionsDiv.appendChild(hiddenLabel);
+                    const unhideBtn = document.createElement('button');
+                    unhideBtn.className = 'btn-unhide';
+                    unhideBtn.textContent = 'ZOBRAZIT';
+                    unhideBtn.onclick = () => setHidden(card.id, false);
+                    actionsDiv.appendChild(unhideBtn);
                 } else {
-                    const doneSpan = document.createElement('span');
-                    doneSpan.style.cssText = 'color:#00ff00; font-weight:bold; padding:8px;';
-                    doneSpan.textContent = 'SCHVALENO';
-                    actionsDiv.appendChild(doneSpan);
+                    const hideBtn = document.createElement('button');
+                    hideBtn.className = 'btn-hide';
+                    hideBtn.textContent = 'SKRYT';
+                    hideBtn.onclick = () => setHidden(card.id, true);
+                    actionsDiv.appendChild(hideBtn);
                 }
 
                 const delBtn = document.createElement('button');
@@ -145,12 +153,12 @@
             });
         }
 
-        async function approve(id) {
+        async function setHidden(id, hide) {
             const { data: { user } } = await _supabase.auth.getUser();
             if (!user) { alert('Nejsi prihlaseny.'); return; }
-            const { error } = await _supabase.from('cards').update({ is_official: true }).eq('id', id);
+            const { error } = await _supabase.from('cards').update({ is_hidden: hide }).eq('id', id);
             if (!error) loadAdmin();
-            else alert('Chyba pri schvalovani.');
+            else alert('Chyba pri zmene viditelnosti.');
         }
 
         async function remove(id) {
