@@ -248,18 +248,24 @@
             } catch (err) { console.error('Chyba odesílání:', err); }
         }
 
-        const spamQuestions = [
-            { q: "Kolik máš rukou, pokud jsi zrovna neutekl z pily?", a: "2" },
-            { q: "Kolik má průměrný muž koulí, pokud mu je stará zrovna neuřízla?", a: "2" },
-            { q: "Kolik rohů má stůl, do kterého v noci pravidelně narážíš malíčkem?", a: "4" },
-            { q: "Kolik prstů ti ukazuje průměrný řidič v Praze, když ho omylem vybrzdíš?", a: "1" },
-            { q: "Kolik piv tvoří ‚jedno vychlazené‘, když se tě manželka ptá, kam jdeš?", a: "1" }
+        // Odpovědi jsou uloženy jako SHA-256 hash se solí — plain text není v kódu
+        const _SS = ‘dkbz26_’;
+        async function _h(s) {
+            const buf = await crypto.subtle.digest(‘SHA-256’, new TextEncoder().encode(s));
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,’0’)).join(‘’);
+        }
+        const _spamRaw = [
+            { q: "Kolik máš rukou, pokud jsi zrovna neutekl z pily?",                        _a: "0cdbf0beac21e73a9764a5d8fdd274996c46958b8a752ad1657c5a6ab5bb5096" },
+            { q: "Kolik má průměrný muž koulí, pokud mu je stará zrovna neuřízla?",          _a: "0cdbf0beac21e73a9764a5d8fdd274996c46958b8a752ad1657c5a6ab5bb5096" },
+            { q: "Kolik rohů má stůl, do kterého v noci pravidelně narážíš malíčkem?",       _a: "ad360c4232783b841caac0dbba060f836e3f0b5eb13f26a7ffd3f99dda4a6345" },
+            { q: "Kolik prstů ti ukazuje průměrný řidič v Praze, když ho omylem vybrzdíš?", _a: "a6ea1c9196ecfbb304f561520edee0ffa80592cfd530defd070ef69ef466ce68" },
+            { q: "Kolik piv tvoří ‚jedno vychlazené’, když se tě manželka ptá, kam jdeš?",  _a: "a6ea1c9196ecfbb304f561520edee0ffa80592cfd530defd070ef69ef466ce68" }
         ];
         let currentSpamChallenge = null;
 
         function initSpamTest() {
-            currentSpamChallenge = spamQuestions[Math.floor(Math.random() * spamQuestions.length)];
-            const label = document.getElementById('spamQuestionLabel');
+            currentSpamChallenge = _spamRaw[Math.floor(Math.random() * _spamRaw.length)];
+            const label = document.getElementById(‘spamQuestionLabel’);
             if (label) label.innerText = currentSpamChallenge.q;
         }
 
@@ -371,9 +377,10 @@
             }
         }
 
-        function saveUser() {
+        async function saveUser() {
             const spamAnswer = document.getElementById('spamAnswerInput').value.trim();
-            if (spamAnswer !== currentSpamChallenge.a) { alert("Matika ti ve škole moc nešla, co?"); initSpamTest(); return; }
+            const answerHash = await _h(_SS + spamAnswer);
+            if (answerHash !== currentSpamChallenge._a) { alert("Matika ti ve škole moc nešla, co?"); initSpamTest(); return; }
             if (document.getElementById('hp_name').value) return;
             const email = document.getElementById('userEmail').value.trim();
             const name = document.getElementById('userName').value.trim() || 'pařmene';
