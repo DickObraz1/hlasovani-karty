@@ -12,9 +12,9 @@ export default async function handler(req, res) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      subscriber_data: { email: email, name: name },
+      subscriber_data: { email: email, name: name, tags: ['hlasovani'] },
       trigger_autoresponders: true,
-      update_existing: false,
+      update_existing: true,
       resubscribe: false,
     }),
   });
