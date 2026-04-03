@@ -74,6 +74,13 @@
         .btn-vote { flex: 4; background: var(--black); color: var(--white); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
         .btn-voted { background: rgba(0,0,0,0.1) !important; color: var(--black) !important; border: 3px solid var(--black) !important; cursor: default; flex: 5; }
         .btn-share { flex: 1; background: transparent; border: 2px solid var(--black); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .share-stats-grid { display: flex; gap: 20px; align-items: center; }
+        .share-left { flex: 1; text-align: center; }
+        .share-right { display: flex; flex-direction: column; gap: 12px; min-width: 130px; }
+        .stat-item { background: rgba(0,0,0,0.12); border-radius: 10px; padding: 12px 16px; text-align: center; }
+        .stat-number { display: block; font-size: 2rem; font-weight: 900; line-height: 1; }
+        .stat-label { display: block; font-size: 0.72rem; font-weight: bold; text-transform: uppercase; margin-top: 4px; opacity: 0.75; }
+        @media (max-width: 500px) { .share-stats-grid { flex-direction: column; } .share-right { flex-direction: row; width: 100%; } .share-right .stat-item { flex: 1; } }
         
         .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 10px; flex-wrap: wrap; }
         .filter-group { display: flex; gap: 5px; }
@@ -170,10 +177,22 @@
             <p id="suggestionText"></p>
             <p id="votesLeftText" style="font-size: 0.9rem; opacity: 0.8;"></p>
             
-            <div class="share-contest-box">
-                <h4>📢 Chceš větší šanci na výhru?</h4>
-                <p>Sdílej soutěž s kámošema! Čím víc lidí tvoje návrhy uvidí, tím víc hlasů můžeš posbírat.</p>
-                <button class="btn-share-main" onclick="shareMainSite()">🚀 SDÍLET SOUTĚŽ</button>
+            <div class="share-contest-box share-stats-grid">
+                <div class="share-left">
+                    <h4>📢 Chceš větší šanci na výhru?</h4>
+                    <p>Sdílej soutěž s kámošema! Čím víc lidí tvoje návrhy uvidí, tím víc hlasů můžeš posbírat.</p>
+                    <button class="btn-share-main" onclick="shareMainSite()">🚀 SDÍLET SOUTĚŽ</button>
+                </div>
+                <div class="share-right">
+                    <div class="stat-item">
+                        <span class="stat-number" id="statCards">–</span>
+                        <span class="stat-label">návrhů karet</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="statUsers">–</span>
+                        <span class="stat-label">hráčů zapojeno</span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -451,12 +470,22 @@
             showToast("Jsi ve hře! 📧");
         }
 
+        async function loadStats() {
+            const { count: cardCount } = await _supabase.from('cards').select('*', { count: 'exact', head: true });
+            const { count: userCount } = await _supabase.from('contestants').select('*', { count: 'exact', head: true });
+            const elCards = document.getElementById('statCards');
+            const elUsers = document.getElementById('statUsers');
+            if (elCards) elCards.textContent = cardCount ?? '–';
+            if (elUsers) elUsers.textContent = userCount ?? '–';
+        }
+
         function checkUser() {
             if (localStorage.getItem('userEmail')) {
                 document.getElementById('userInfoSection').classList.add('hidden');
                 document.getElementById('welcomeBack').classList.remove('hidden');
                 document.getElementById('suggestionForm').classList.remove('hidden');
                 updateSuggestionCountDisplay();
+                loadStats();
             }
         }
 
