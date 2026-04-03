@@ -222,8 +222,9 @@
                 <button onclick="setFilter('odpověď', this)">ODPOVĚDI</button>
             </div>
             <select id="sortSelect" onchange="fetchCards()" style="width: auto; margin-bottom: 0;">
-                <option value="newest">Nejnovější</option>
                 <option value="popular">Podle hlasů</option>
+                <option value="newest">Nejnovější</option>
+                <option value="random">Náhodně</option>
             </select>
         </div>
 
@@ -374,6 +375,7 @@
                 hasVoted: userVotes.includes(card.id)
             })) : [];
             if (sortBy === 'popular') cardsWithVotes.sort((a, b) => b.totalVotes - a.totalVotes);
+            else if (sortBy === 'random') cardsWithVotes.sort(() => Math.random() - 0.5);
             else cardsWithVotes.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             const container = document.getElementById('cardsList');
             container.innerHTML = '';
