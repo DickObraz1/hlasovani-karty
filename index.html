@@ -475,10 +475,9 @@
         }
 
         async function loadStats() {
-            const { count: cardCount } = await _supabase.from('cards').select('*', { count: 'exact', head: true });
-            const { count: userCount } = await _supabase.from('contestants').select('*', { count: 'exact', head: true });
+            const data = await fetch('/api/stats').then(r => r.json()).catch(() => ({ cards: 0, users: 0 }));
             function countUp(el, target) {
-                if (!el || target == null) return;
+                if (!el || !target) return;
                 let current = 0;
                 const step = Math.max(1, Math.ceil(target / 40));
                 const interval = setInterval(() => {
@@ -487,8 +486,8 @@
                     if (current >= target) clearInterval(interval);
                 }, 25);
             }
-            countUp(document.getElementById('statCards'), cardCount ?? 0);
-            countUp(document.getElementById('statUsers'), userCount ?? 0);
+            countUp(document.getElementById('statCards'), data.cards);
+            countUp(document.getElementById('statUsers'), data.users);
         }
 
         function checkUser() {
